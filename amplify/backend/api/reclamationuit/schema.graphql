@@ -1,0 +1,9 @@
+type Etudiant @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  nom: String!
+  prenom: String!
+  apogee: String!
+  cin: String!
+  cycle: String!
+  email: AWSEmail! @index(name: "byEmail", queryField: "etudiantByEmail")
+}

@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-reclamationuit-dev-09a09-authRole",
+      "UnauthRoleArn": "arn:aws:iam::143098194828:role/amplify-reclamationuit-dev-09a09-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::143098194828:role/amplify-reclamationuit-dev-09a09-authRole",
+      "Region": "eu-north-1",
+      "DeploymentBucketName": "amplify-reclamationuit-dev-09a09-deployment",
+      "UnauthRoleName": "amplify-reclamationuit-dev-09a09-unauthRole",
+      "StackName": "amplify-reclamationuit-dev-09a09",
+      "StackId": "arn:aws:cloudformation:eu-north-1:143098194828:stack/amplify-reclamationuit-dev-09a09/22a09d40-667a-11f0-b3cb-0efeaa55f845",
+      "AmplifyAppId": "d2zkzmxdxg8w8"
+    },
+    "categories": {
+      "auth": {
+        "reclamationuitf9c379a3": {}
+      },
+      "api": {
+        "reclamationuit": {}
+      }
+    }
+  }
+}
