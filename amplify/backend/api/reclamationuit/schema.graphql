@@ -1,4 +1,6 @@
-type Etudiant @model @auth(rules: [{ allow: public }]) {
+type Etudiant @model @auth(rules: [  { allow: owner, ownerField: "owner", operations: [create, read, update]
+ } , { allow: public, operations: [create] }
+]) {
   id: ID!
   nom: String!
   prenom: String!
@@ -6,4 +8,6 @@ type Etudiant @model @auth(rules: [{ allow: public }]) {
   cin: String!
   cycle: String!
   email: AWSEmail! @index(name: "byEmail", queryField: "etudiantByEmail")
+  owner: String
+
 }

@@ -23,7 +23,7 @@ class _SignInPageState extends State<SignInPage> {
   void _showTopFlushbar(String message) {
     Flushbar(
       message: message,
-      backgroundColor: const Color.fromARGB(255, 117, 7, 190),
+      backgroundColor: const Color.fromARGB(255, 51, 4, 240),
       duration: const Duration(seconds: 2),
       flushbarPosition: FlushbarPosition.TOP,
       margin: const EdgeInsets.all(20),

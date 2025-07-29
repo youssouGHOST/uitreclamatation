@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:amplify_api/amplify_api.dart';
+import 'models/ModelProvider.dart';
 
 class ConfirmSignUpPage extends StatefulWidget {
-  final String email; // tu peux passer l'email depuis la page signup
+  final String email;
+  final String password;
+  final String nom;
+  final String prenom;
+  final String apogee;
+  final String cin;
+  final String cycle;
 
-  ConfirmSignUpPage({required this.email});
+  ConfirmSignUpPage({
+    required this.email,
+    required this.password,
+    required this.nom,
+    required this.prenom,
+    required this.apogee,
+    required this.cin,
+    required this.cycle,
+  });
 
   @override
   _ConfirmSignUpPageState createState() => _ConfirmSignUpPageState();
@@ -21,10 +37,48 @@ class _ConfirmSignUpPageState extends State<ConfirmSignUpPage> {
       );
 
       if (result.isSignUpComplete) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Inscription confirmée. Connecte-toi !")),
+        //  Connexion après confirmation
+        final signInResult = await Amplify.Auth.signIn(
+          username: widget.email,
+          password: widget.password,
         );
-        Navigator.pop(context); // Retour à la page de connexion
+        final user = await Amplify.Auth.getCurrentUser();
+final ownerEmail = user.username;
+
+
+        if (signInResult.isSignedIn) {
+          //  Ajout dans la base
+          final newEtudiant = Etudiant(
+            nom: widget.nom,
+            prenom: widget.prenom,
+            apogee: widget.apogee,
+            cin: widget.cin,
+            cycle: widget.cycle,
+            email: widget.email,
+            owner: ownerEmail,
+
+          );
+
+          final response = await Amplify.API.mutate(
+            request: ModelMutations.create(newEtudiant),
+          ).response;
+
+          if (response.hasErrors) {
+            safePrint("Erreur GraphQL : ${response.errors}");
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Erreur lors de l'enregistrement")),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Inscription réussie !")),
+            );
+            Navigator.pop(context); // Retour à la page de connexion
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Connexion échouée.")),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Confirmation incomplète.")),

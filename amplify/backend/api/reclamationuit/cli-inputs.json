@@ -4,8 +4,17 @@
     "apiName": "reclamationuit",
     "serviceName": "AppSync",
     "defaultAuthType": {
-      "mode": "API_KEY",
-      "expirationTime": 7
-    }
+      "mode": "AMAZON_COGNITO_USER_POOLS",
+      "cognitoUserPoolId": "authreclamationuitf9c379a3"
+    },
+    "additionalAuthTypes": [
+      {
+        "mode": "API_KEY",
+        "expirationTime": 7,
+        "apiKeyExpirationDate": "2025-08-05T14:18:32.103Z",
+        "keyDescription": "youshost"
+      }
+    ],
+    "conflictResolution": {}
   }
 }

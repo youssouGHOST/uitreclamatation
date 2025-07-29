@@ -54,12 +54,21 @@ class _SignUpPageState extends State<SignUpPage> {
   Navigator.pop(context); // Retour à login
 } else {
   // 🔁 Naviguer vers la page de confirmation
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => ConfirmSignUpPage(email: email),
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (_) => ConfirmSignUpPage(
+      email: email,
+      password: password,
+     nom: nom,
+      prenom: prenom,
+      apogee: apogee,
+      cin: cin,
+      cycle: cycle,
     ),
-  );
+  ),
+);
+
 }
 
     } catch (e) {

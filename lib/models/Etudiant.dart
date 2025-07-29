@@ -15,7 +15,7 @@
 
 // NOTE: This file is generated and may not follow lint rules defined in your app
 // Generated files can be excluded from analysis in analysis_options.yaml
-// For more info, see: https://dart.dev/guide s/language/analysis-options#excluding-code-from-analysis
+// For more info, see: https://dart.dev/guides/language/analysis-options#excluding-code-from-analysis
 
 // ignore_for_file: public_member_api_docs, annotate_overrides, dead_code, dead_codepublic_member_api_docs, depend_on_referenced_packages, file_names, library_private_types_in_public_api, no_leading_underscores_for_library_prefixes, no_leading_underscores_for_local_identifiers, non_constant_identifier_names, null_check_on_nullable_type_parameter, override_on_non_overriding_member, prefer_adjacent_string_concatenation, prefer_const_constructors, prefer_if_null_operators, prefer_interpolation_to_compose_strings, slash_for_doc_comments, sort_child_properties_last, unnecessary_const, unnecessary_constructor_name, unnecessary_late, unnecessary_new, unnecessary_null_aware_assignments, unnecessary_nullable_for_final_variable_declarations, unnecessary_string_interpolations, use_build_context_synchronously
 
@@ -33,6 +33,7 @@ class Etudiant extends amplify_core.Model {
   final String? _cin;
   final String? _cycle;
   final String? _email;
+  final String? _owner;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -127,6 +128,10 @@ class Etudiant extends amplify_core.Model {
     }
   }
   
+  String? get owner {
+    return _owner;
+  }
+  
   amplify_core.TemporalDateTime? get createdAt {
     return _createdAt;
   }
@@ -135,9 +140,9 @@ class Etudiant extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Etudiant._internal({required this.id, required nom, required prenom, required apogee, required cin, required cycle, required email, createdAt, updatedAt}): _nom = nom, _prenom = prenom, _apogee = apogee, _cin = cin, _cycle = cycle, _email = email, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Etudiant._internal({required this.id, required nom, required prenom, required apogee, required cin, required cycle, required email, owner, createdAt, updatedAt}): _nom = nom, _prenom = prenom, _apogee = apogee, _cin = cin, _cycle = cycle, _email = email, _owner = owner, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Etudiant({String? id, required String nom, required String prenom, required String apogee, required String cin, required String cycle, required String email}) {
+  factory Etudiant({String? id, required String nom, required String prenom, required String apogee, required String cin, required String cycle, required String email, String? owner}) {
     return Etudiant._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       nom: nom,
@@ -145,7 +150,8 @@ class Etudiant extends amplify_core.Model {
       apogee: apogee,
       cin: cin,
       cycle: cycle,
-      email: email);
+      email: email,
+      owner: owner);
   }
   
   bool equals(Object other) {
@@ -162,7 +168,8 @@ class Etudiant extends amplify_core.Model {
       _apogee == other._apogee &&
       _cin == other._cin &&
       _cycle == other._cycle &&
-      _email == other._email;
+      _email == other._email &&
+      _owner == other._owner;
   }
   
   @override
@@ -180,6 +187,7 @@ class Etudiant extends amplify_core.Model {
     buffer.write("cin=" + "$_cin" + ", ");
     buffer.write("cycle=" + "$_cycle" + ", ");
     buffer.write("email=" + "$_email" + ", ");
+    buffer.write("owner=" + "$_owner" + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
@@ -187,7 +195,7 @@ class Etudiant extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Etudiant copyWith({String? nom, String? prenom, String? apogee, String? cin, String? cycle, String? email}) {
+  Etudiant copyWith({String? nom, String? prenom, String? apogee, String? cin, String? cycle, String? email, String? owner}) {
     return Etudiant._internal(
       id: id,
       nom: nom ?? this.nom,
@@ -195,7 +203,8 @@ class Etudiant extends amplify_core.Model {
       apogee: apogee ?? this.apogee,
       cin: cin ?? this.cin,
       cycle: cycle ?? this.cycle,
-      email: email ?? this.email);
+      email: email ?? this.email,
+      owner: owner ?? this.owner);
   }
   
   Etudiant copyWithModelFieldValues({
@@ -204,7 +213,8 @@ class Etudiant extends amplify_core.Model {
     ModelFieldValue<String>? apogee,
     ModelFieldValue<String>? cin,
     ModelFieldValue<String>? cycle,
-    ModelFieldValue<String>? email
+    ModelFieldValue<String>? email,
+    ModelFieldValue<String?>? owner
   }) {
     return Etudiant._internal(
       id: id,
@@ -213,7 +223,8 @@ class Etudiant extends amplify_core.Model {
       apogee: apogee == null ? this.apogee : apogee.value,
       cin: cin == null ? this.cin : cin.value,
       cycle: cycle == null ? this.cycle : cycle.value,
-      email: email == null ? this.email : email.value
+      email: email == null ? this.email : email.value,
+      owner: owner == null ? this.owner : owner.value
     );
   }
   
@@ -225,11 +236,12 @@ class Etudiant extends amplify_core.Model {
       _cin = json['cin'],
       _cycle = json['cycle'],
       _email = json['email'],
+      _owner = json['owner'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'nom': _nom, 'prenom': _prenom, 'apogee': _apogee, 'cin': _cin, 'cycle': _cycle, 'email': _email, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'nom': _nom, 'prenom': _prenom, 'apogee': _apogee, 'cin': _cin, 'cycle': _cycle, 'email': _email, 'owner': _owner, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
@@ -240,6 +252,7 @@ class Etudiant extends amplify_core.Model {
     'cin': _cin,
     'cycle': _cycle,
     'email': _email,
+    'owner': _owner,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
@@ -252,18 +265,21 @@ class Etudiant extends amplify_core.Model {
   static final CIN = amplify_core.QueryField(fieldName: "cin");
   static final CYCLE = amplify_core.QueryField(fieldName: "cycle");
   static final EMAIL = amplify_core.QueryField(fieldName: "email");
+  static final OWNER = amplify_core.QueryField(fieldName: "owner");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "Etudiant";
     modelSchemaDefinition.pluralName = "Etudiants";
     
     modelSchemaDefinition.authRules = [
       amplify_core.AuthRule(
-        authStrategy: amplify_core.AuthStrategy.PUBLIC,
+        authStrategy: amplify_core.AuthStrategy.OWNER,
+        ownerField: "owner",
+        identityClaim: "cognito:username",
+        provider: amplify_core.AuthRuleProvider.USERPOOLS,
         operations: const [
           amplify_core.ModelOperation.CREATE,
-          amplify_core.ModelOperation.UPDATE,
-          amplify_core.ModelOperation.DELETE,
-          amplify_core.ModelOperation.READ
+          amplify_core.ModelOperation.READ,
+          amplify_core.ModelOperation.UPDATE
         ])
     ];
     
@@ -306,6 +322,12 @@ class Etudiant extends amplify_core.Model {
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
       key: Etudiant.EMAIL,
       isRequired: true,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Etudiant.OWNER,
+      isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
