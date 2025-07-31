@@ -100,6 +100,8 @@ final ownerEmail = user.username;
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+                        Align(alignment: Alignment.bottomLeft, child: Image.asset("assets/bottom1.png")),
+
             Text("Un code a été envoyé à ${widget.email}"),
             TextFormField(
               decoration: InputDecoration(labelText: "Code de confirmation"),
