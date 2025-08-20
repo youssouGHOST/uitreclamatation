@@ -19,12 +19,55 @@ class _SignUpPageState extends State<SignUpPage> {
   String prenom = '';
   String apogee = '';
   String cin = '';
-  String cycle = '';
+  Cycle? cycle;
+  Filiere? selectedFiliere;
+
   bool _obscurePassword = true;
   bool _isLoading = false;
+  bool isLoadingFilieres = true;
+  List<Filiere> filieres = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchFilieres();
+  }
+
+  Future<void> _fetchFilieres() async {
+    setState(() => isLoadingFilieres = true);
+    try {
+      final request = ModelQueries.list(
+        Filiere.classType,
+        authorizationMode: APIAuthorizationType.apiKey, // 🔹 lecture publique
+      );
+
+      final response = await Amplify.API.query(request: request).response;
+
+      if (response.data != null) {
+        setState(() {
+          filieres = response.data!.items.whereType<Filiere>().toList();
+          isLoadingFilieres = false;
+        });
+      } else if (response.errors.isNotEmpty) {
+        safePrint("GraphQL errors: ${response.errors}");
+        setState(() => isLoadingFilieres = false);
+      }
+    } catch (e) {
+      safePrint("Erreur récupération filières : $e");
+      setState(() => isLoadingFilieres = false);
+    }
+  }
 
   Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (selectedFiliere == null || cycle == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Veuillez choisir un cycle et une filière")),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
@@ -37,23 +80,9 @@ class _SignUpPageState extends State<SignUpPage> {
       );
 
       if (signUpResult.isSignUpComplete) {
-        final newEtudiant = Etudiant(
-          nom: nom,
-          prenom: prenom,
-          apogee: apogee,
-          cin: cin,
-          cycle: cycle,
-          email: email,
-        );
-
-        await Amplify.API.mutate(
-          request: ModelMutations.create(newEtudiant),
-        ).response;
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Inscription réussie")),
         );
-
         Navigator.pop(context);
       } else {
         Navigator.push(
@@ -66,7 +95,8 @@ class _SignUpPageState extends State<SignUpPage> {
               prenom: prenom,
               apogee: apogee,
               cin: cin,
-              cycle: cycle,
+              filiere: selectedFiliere!,
+              cycle: cycle!,
             ),
           ),
         );
@@ -76,102 +106,86 @@ class _SignUpPageState extends State<SignUpPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Erreur : $e")),
       );
+    } finally {
+      setState(() => _isLoading = false);
     }
-    setState(() => _isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Align(alignment: Alignment.bottomLeft, child: Image.asset("assets/bottom1.png")),
-
-            Align(alignment: Alignment.topCenter, child: Padding(padding: const EdgeInsets.all(10), child: Image.asset('assets/ibn.png', width: 120))),
-            Align(alignment: Alignment.topRight, child: Image.asset('assets/login_img.png', width: 100)),
-            Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        "",
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 39, 129, 255),
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Courier',
-                          shadows: [
-                            Shadow(offset: Offset(2, 2), blurRadius: 4.0, color: Color.fromARGB(66, 0, 0, 0)),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Card(
-                        color: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Column(
-                            children: [
-                              _buildTextField(label: 'Email', icon: Icons.email, onChanged: (v) => email = v),
-                              const SizedBox(height: 12),
-                              _buildTextField(
-                                label: 'Mot de passe',
-                                icon: Icons.lock,
-                                obscure: _obscurePassword,
-                                suffixIcon: IconButton(
-                                  icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                                ),
-                                onChanged: (v) => password = v,
-                              ),
-                              const SizedBox(height: 12),
-                              _buildTextField(label: 'Nom', icon: Icons.person, onChanged: (v) => nom = v),
-                              const SizedBox(height: 12),
-                              _buildTextField(label: 'Prénom', icon: Icons.person_outline, onChanged: (v) => prenom = v),
-                              const SizedBox(height: 12),
-                              _buildTextField(label: 'CIN', icon: Icons.credit_card, onChanged: (v) => cin = v),
-                              const SizedBox(height: 12),
-                              _buildTextField(label: 'Apogée', icon: Icons.school, onChanged: (v) => apogee = v),
-                              const SizedBox(height: 12),
-                              _buildTextField(label: 'Cycle', icon: Icons.book, onChanged: (v) => cycle = v),
-                              const SizedBox(height: 24),
-                              SizedBox(
-                                width: double.infinity,
-                                child: FilledButton(
-                                  onPressed: _isLoading ? null : _signUp,
-                                  style: FilledButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                  ),
-                                  child: _isLoading
-                                      ? const CircularProgressIndicator(color: Colors.white)
-                                      : const Text('S’inscrire'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Déjà un compte ? Se connecter"),
-                      ),
-                    ],
-                  ),
+      appBar: AppBar(title: Text("Inscription")),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              _buildTextField(
+                  label: 'Email',
+                  icon: Icons.email,
+                  onChanged: (v) => email = v,
+                  validator: _validateEmail),
+              _buildTextField(
+                label: 'Mot de passe',
+                icon: Icons.lock,
+                obscure: _obscurePassword,
+                onChanged: (v) => password = v,
+                validator: _validatePassword,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                      _obscurePassword ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
-            ),
-          ],
+              _buildTextField(label: 'Nom', icon: Icons.person, onChanged: (v) => nom = v),
+              _buildTextField(label: 'Prénom', icon: Icons.person, onChanged: (v) => prenom = v),
+              _buildTextField(label: 'CIN', icon: Icons.credit_card, onChanged: (v) => cin = v),
+              _buildTextField(label: 'Apogée', icon: Icons.school, onChanged: (v) => apogee = v),
+              SizedBox(height: 16),
+
+              DropdownButtonFormField<Cycle>(
+                decoration: InputDecoration(labelText: "Cycle"),
+                value: cycle,
+                items: Cycle.values
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
+                    .toList(),
+                onChanged: (value) => setState(() => cycle = value),
+                validator: (value) => value == null ? "Choisissez un cycle" : null,
+                isExpanded: true,
+              ),
+              SizedBox(height: 16),
+
+              isLoadingFilieres
+                  ? CircularProgressIndicator()
+                  : DropdownButtonFormField<Filiere>(
+                      decoration: InputDecoration(labelText: "Filière"),
+                      value: selectedFiliere,
+                      items: filieres
+                          .map((f) => DropdownMenuItem(
+                                value: f,
+                                child: Text(f.nomFiliere.name),
+                              ))
+                          .toList(),
+                      onChanged: (value) => setState(() => selectedFiliere = value),
+                      validator: (value) => value == null ? "Choisissez une filière" : null,
+                      isExpanded: true,
+                    ),
+              SizedBox(height: 24),
+
+              ElevatedButton(
+                onPressed: _isLoading ? null : _signUp,
+                style: ElevatedButton.styleFrom(minimumSize: Size(double.infinity, 50)),
+                child: _isLoading
+                    ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : Text("S'inscrire"),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -182,18 +196,35 @@ class _SignUpPageState extends State<SignUpPage> {
     required IconData icon,
     required void Function(String) onChanged,
     bool obscure = false,
+    String? Function(String?)? validator,
     Widget? suffixIcon,
   }) {
-    return TextFormField(
-      obscureText: obscure,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-        suffixIcon: suffixIcon,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: TextFormField(
+        obscureText: obscure,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon),
+          suffixIcon: suffixIcon,
+          border: OutlineInputBorder(),
+        ),
+        onChanged: onChanged,
+        validator: validator ?? (value) => (value == null || value.isEmpty) ? 'Champ requis' : null,
       ),
-      onChanged: onChanged,
-      validator: (value) => (value == null || value.isEmpty) ? 'Champ requis' : null,
     );
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) return "Champ requis";
+    final regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!regex.hasMatch(value)) return "Email invalide";
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) return "Champ requis";
+    if (value.length < 6) return "Mot de passe trop court (6 caractères minimum)";
+    return null;
   }
 }

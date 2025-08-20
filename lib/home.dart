@@ -2,7 +2,13 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:reclamation_uit/demande.dart';
+import 'package:reclamation_uit/demandepage.dart';
 import 'signin.dart';
+import './widget/CustomBottomNav.dart';
+import 'profil.dart';
+import 'package:provider/provider.dart';
+import 'provider/EtudiantProvider.dart'; // chemin vers ton provider
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -11,54 +17,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
-
-  Future<void> signOut() async {
-    try {
-      final result = await Amplify.Auth.signOut();
-      if (result is CognitoCompleteSignOut) {
-        safePrint("Déconnexion réussie");
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const SignInPage()),
-        );
-      } else if (result is CognitoFailedSignOut) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Erreur de déconnexion")),
-        );
-      }
-    } catch (e) {
-      safePrint("Erreur lors de la déconnexion : $e");
-    }
-  }
-
-  void _onItemTapped(int index) async {
-    switch (index) {
-      case 0:
-        // Tu peux ajouter ici une navigation vers "FaireDemande" si besoin
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const Demande()),
-        );
-        break;
-      case 2:
-        await signOut();
-        break;
-    }
-
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
+  
   @override
   Widget build(BuildContext context) {
+        final etudiant = Provider.of<EtudiantProvider>(context).etudiant;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Bienvenue"),
+        title: Text("Bienvenue"),
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 47, 141, 255),
         foregroundColor: Colors.white,
@@ -77,10 +44,10 @@ class _HomePageState extends State<HomePage> {
                 fit: BoxFit.cover,
               ),
               const SizedBox(height: 24),
-              const Text(
-                "Bienvenue Youssou, dans votre espace de demande de réclamation",
+               Text(  
+                "Bienvenue ${etudiant?.nom ?? ''}" " ${etudiant?.prenom ?? ''} , dans votre espace de demande de réclamation",
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 20,
                   fontWeight: FontWeight.w600,
                   color: Colors.black87,
                 ),
@@ -99,7 +66,7 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                     onPressed: () {
                       // Exemple : aller vers FaireDemande
-                      // Navigator.push(context, MaterialPageRoute(builder: (_) => const FaireDemande()));
+                       Navigator.push(context, MaterialPageRoute(builder: (_) =>  DemandePage( etudiant:etudiant!)));
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -164,50 +131,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 242, 242, 242),
-          boxShadow: [
-            BoxShadow(
-              color: const Color.fromARGB(255, 251, 250, 252).withOpacity(0.6),
-              blurRadius: 12,
-              offset: const Offset(0, -5),
-            ),
-          ],
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(60),
-            topRight: Radius.circular(60),
-          ),
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(60),
-            topRight: Radius.circular(60),
-          ),
-          child: BottomNavigationBar(
-            backgroundColor: Colors.transparent,
-            selectedItemColor: Colors.blue,
-            unselectedItemColor: Colors.grey,
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            elevation: 0,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.add_box_rounded),
-                label: "Faire demande",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.list_alt_rounded),
-                label: "Mes demandes",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.logout),
-                label: "Déconnexion",
-              ),
-            ],
-          ),
-        ),
-      ),
+              bottomNavigationBar: CustomBottomNav(), // ✅ insertion
+
     );
   }
 }

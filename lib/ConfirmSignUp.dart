@@ -9,8 +9,9 @@ class ConfirmSignUpPage extends StatefulWidget {
   final String nom;
   final String prenom;
   final String apogee;
-  final String cin;
-  final String cycle;
+  final String cin; 
+  final Filiere filiere;
+  final Cycle cycle;
 
   ConfirmSignUpPage({
     required this.email,
@@ -19,6 +20,7 @@ class ConfirmSignUpPage extends StatefulWidget {
     required this.prenom,
     required this.apogee,
     required this.cin,
+    required this.filiere,
     required this.cycle,
   });
 
@@ -56,6 +58,7 @@ final ownerEmail = user.username;
             cycle: widget.cycle,
             email: widget.email,
             owner: ownerEmail,
+            filiere: widget.filiere,
 
           );
 

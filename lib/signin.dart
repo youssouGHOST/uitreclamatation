@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'models/ModelProvider.dart';
 import 'home.dart';
 import 'signup.dart';
+import 'provider/EtudiantProvider.dart'; 
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -56,18 +58,21 @@ class _SignInPageState extends State<SignInPage> {
 
     try {
       final res = await Amplify.Auth.signIn(username: email, password: password);
-      //-------------------------------------------------------
       print("Résultat connexion : ${res.isSignedIn}");
 
-      final etudiant = await _fetchEtudiant(email);
-      print("Étudiant récupéré : $etudiant");
-      //
       if (res.isSignedIn) {
+        // On récupère l'étudiant **une seule fois**
         final etudiant = await _fetchEtudiant(email);
+        print("Étudiant récupéré : $etudiant");
+
         if (etudiant != null) {
+          // Stocker l'étudiant dans le Provider
+          Provider.of<EtudiantProvider>(context, listen: false).setEtudiant(etudiant);
+
+          // Naviguer vers HomePage
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => HomePage()),
+            MaterialPageRoute(builder: (_) => const HomePage()),
           );
         } else {
           _showTopFlushbar("Étudiant non trouvé.");
@@ -76,27 +81,23 @@ class _SignInPageState extends State<SignInPage> {
         _showTopFlushbar("Échec de la connexion.");
       }
     } catch (e, stackTrace) {
-  safePrint("Erreur login : $e");
-  safePrint("Type d'exception : ${e.runtimeType}");
-  safePrint("StackTrace : $stackTrace");
+      safePrint("Erreur login : $e");
+      safePrint("Type d'exception : ${e.runtimeType}");
+      safePrint("StackTrace : $stackTrace");
 
-  String errorMessage = "Une erreur inconnue est survenue.";
+      String errorMessage = "Une erreur inconnue est survenue.";
 
-  if (e is AuthException) {
-    errorMessage = e.message;
-    safePrint("Message d'erreur : ${e.message}");
-    safePrint("Suggestion de récupération : ${e.recoverySuggestion}");
-  }
+      if (e is AuthException) {
+        errorMessage = e.message;
+        safePrint("Message d'erreur : ${e.message}");
+        safePrint("Suggestion de récupération : ${e.recoverySuggestion}");
+      }
 
-  _showTopFlushbar("Erreur : $errorMessage");
-}
+      _showTopFlushbar("Erreur : $errorMessage");
+    }
+
     setState(() => _isLoading = false);
   }
-
-  Future<AuthUser> getCurrentUser() async {
-  final user = await Amplify.Auth.getCurrentUser();
-  return user;
-}
 
   @override
   Widget build(BuildContext context) {
@@ -177,9 +178,9 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                   TextButton(
+                    TextButton(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) =>SignUpPage()));
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => SignUpPage()));
                       },
                       child: const Text("Créer un compte"),
                     ), 

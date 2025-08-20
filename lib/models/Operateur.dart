@@ -21,22 +21,16 @@
 
 import 'ModelProvider.dart';
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
-import 'package:collection/collection.dart';
 
 
-/** This is an auto generated class representing the Etudiant type in your schema. */
-class Etudiant extends amplify_core.Model {
-  static const classType = const _EtudiantModelType();
+/** This is an auto generated class representing the Operateur type in your schema. */
+class Operateur extends amplify_core.Model {
+  static const classType = const _OperateurModelType();
   final String id;
   final String? _nom;
   final String? _prenom;
-  final String? _apogee;
-  final String? _cin;
-  final Cycle? _cycle;
   final String? _email;
-  final String? _owner;
   final Filiere? _filiere;
-  final List<Demande>? _demande;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -47,8 +41,8 @@ class Etudiant extends amplify_core.Model {
   @override
   String getId() => id;
   
-  EtudiantModelIdentifier get modelIdentifier {
-      return EtudiantModelIdentifier(
+  OperateurModelIdentifier get modelIdentifier {
+      return OperateurModelIdentifier(
         id: id
       );
   }
@@ -79,45 +73,6 @@ class Etudiant extends amplify_core.Model {
     }
   }
   
-  String get apogee {
-    try {
-      return _apogee!;
-    } catch(e) {
-      throw amplify_core.AmplifyCodeGenModelException(
-          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
-          recoverySuggestion:
-            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
-          underlyingException: e.toString()
-          );
-    }
-  }
-  
-  String get cin {
-    try {
-      return _cin!;
-    } catch(e) {
-      throw amplify_core.AmplifyCodeGenModelException(
-          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
-          recoverySuggestion:
-            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
-          underlyingException: e.toString()
-          );
-    }
-  }
-  
-  Cycle get cycle {
-    try {
-      return _cycle!;
-    } catch(e) {
-      throw amplify_core.AmplifyCodeGenModelException(
-          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
-          recoverySuggestion:
-            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
-          underlyingException: e.toString()
-          );
-    }
-  }
-  
   String get email {
     try {
       return _email!;
@@ -131,16 +86,8 @@ class Etudiant extends amplify_core.Model {
     }
   }
   
-  String? get owner {
-    return _owner;
-  }
-  
   Filiere? get filiere {
     return _filiere;
-  }
-  
-  List<Demande>? get demande {
-    return _demande;
   }
   
   amplify_core.TemporalDateTime? get createdAt {
@@ -151,20 +98,15 @@ class Etudiant extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Etudiant._internal({required this.id, required nom, required prenom, required apogee, required cin, required cycle, required email, owner, filiere, demande, createdAt, updatedAt}): _nom = nom, _prenom = prenom, _apogee = apogee, _cin = cin, _cycle = cycle, _email = email, _owner = owner, _filiere = filiere, _demande = demande, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Operateur._internal({required this.id, required nom, required prenom, required email, filiere, createdAt, updatedAt}): _nom = nom, _prenom = prenom, _email = email, _filiere = filiere, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Etudiant({String? id, required String nom, required String prenom, required String apogee, required String cin, required Cycle cycle, required String email, String? owner, Filiere? filiere, List<Demande>? demande}) {
-    return Etudiant._internal(
+  factory Operateur({String? id, required String nom, required String prenom, required String email, Filiere? filiere}) {
+    return Operateur._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       nom: nom,
       prenom: prenom,
-      apogee: apogee,
-      cin: cin,
-      cycle: cycle,
       email: email,
-      owner: owner,
-      filiere: filiere,
-      demande: demande != null ? List<Demande>.unmodifiable(demande) : demande);
+      filiere: filiere);
   }
   
   bool equals(Object other) {
@@ -174,17 +116,12 @@ class Etudiant extends amplify_core.Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Etudiant &&
+    return other is Operateur &&
       id == other.id &&
       _nom == other._nom &&
       _prenom == other._prenom &&
-      _apogee == other._apogee &&
-      _cin == other._cin &&
-      _cycle == other._cycle &&
       _email == other._email &&
-      _owner == other._owner &&
-      _filiere == other._filiere &&
-      DeepCollectionEquality().equals(_demande, other._demande);
+      _filiere == other._filiere;
   }
   
   @override
@@ -194,15 +131,11 @@ class Etudiant extends amplify_core.Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Etudiant {");
+    buffer.write("Operateur {");
     buffer.write("id=" + "$id" + ", ");
     buffer.write("nom=" + "$_nom" + ", ");
     buffer.write("prenom=" + "$_prenom" + ", ");
-    buffer.write("apogee=" + "$_apogee" + ", ");
-    buffer.write("cin=" + "$_cin" + ", ");
-    buffer.write("cycle=" + (_cycle != null ? amplify_core.enumToString(_cycle)! : "null") + ", ");
     buffer.write("email=" + "$_email" + ", ");
-    buffer.write("owner=" + "$_owner" + ", ");
     buffer.write("filiere=" + (_filiere != null ? _filiere!.toString() : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
@@ -211,194 +144,112 @@ class Etudiant extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Etudiant copyWith({String? nom, String? prenom, String? apogee, String? cin, Cycle? cycle, String? email, String? owner, Filiere? filiere, List<Demande>? demande}) {
-    return Etudiant._internal(
+  Operateur copyWith({String? nom, String? prenom, String? email, Filiere? filiere}) {
+    return Operateur._internal(
       id: id,
       nom: nom ?? this.nom,
       prenom: prenom ?? this.prenom,
-      apogee: apogee ?? this.apogee,
-      cin: cin ?? this.cin,
-      cycle: cycle ?? this.cycle,
       email: email ?? this.email,
-      owner: owner ?? this.owner,
-      filiere: filiere ?? this.filiere,
-      demande: demande ?? this.demande);
+      filiere: filiere ?? this.filiere);
   }
   
-  Etudiant copyWithModelFieldValues({
+  Operateur copyWithModelFieldValues({
     ModelFieldValue<String>? nom,
     ModelFieldValue<String>? prenom,
-    ModelFieldValue<String>? apogee,
-    ModelFieldValue<String>? cin,
-    ModelFieldValue<Cycle>? cycle,
     ModelFieldValue<String>? email,
-    ModelFieldValue<String?>? owner,
-    ModelFieldValue<Filiere?>? filiere,
-    ModelFieldValue<List<Demande>?>? demande
+    ModelFieldValue<Filiere?>? filiere
   }) {
-    return Etudiant._internal(
+    return Operateur._internal(
       id: id,
       nom: nom == null ? this.nom : nom.value,
       prenom: prenom == null ? this.prenom : prenom.value,
-      apogee: apogee == null ? this.apogee : apogee.value,
-      cin: cin == null ? this.cin : cin.value,
-      cycle: cycle == null ? this.cycle : cycle.value,
       email: email == null ? this.email : email.value,
-      owner: owner == null ? this.owner : owner.value,
-      filiere: filiere == null ? this.filiere : filiere.value,
-      demande: demande == null ? this.demande : demande.value
+      filiere: filiere == null ? this.filiere : filiere.value
     );
   }
   
-  Etudiant.fromJson(Map<String, dynamic> json)  
+  Operateur.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
       _nom = json['nom'],
       _prenom = json['prenom'],
-      _apogee = json['apogee'],
-      _cin = json['cin'],
-      _cycle = amplify_core.enumFromString<Cycle>(json['cycle'], Cycle.values),
       _email = json['email'],
-      _owner = json['owner'],
       _filiere = json['filiere'] != null
         ? json['filiere']['serializedData'] != null
           ? Filiere.fromJson(new Map<String, dynamic>.from(json['filiere']['serializedData']))
           : Filiere.fromJson(new Map<String, dynamic>.from(json['filiere']))
         : null,
-      _demande = json['demande']  is Map
-        ? (json['demande']['items'] is List
-          ? (json['demande']['items'] as List)
-              .where((e) => e != null)
-              .map((e) => Demande.fromJson(new Map<String, dynamic>.from(e)))
-              .toList()
-          : null)
-        : (json['demande'] is List
-          ? (json['demande'] as List)
-              .where((e) => e?['serializedData'] != null)
-              .map((e) => Demande.fromJson(new Map<String, dynamic>.from(e?['serializedData'])))
-              .toList()
-          : null),
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'nom': _nom, 'prenom': _prenom, 'apogee': _apogee, 'cin': _cin, 'cycle': amplify_core.enumToString(_cycle), 'email': _email, 'owner': _owner, 'filiere': _filiere?.toJson(), 'demande': _demande?.map((Demande? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'nom': _nom, 'prenom': _prenom, 'email': _email, 'filiere': _filiere?.toJson(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
     'id': id,
     'nom': _nom,
     'prenom': _prenom,
-    'apogee': _apogee,
-    'cin': _cin,
-    'cycle': _cycle,
     'email': _email,
-    'owner': _owner,
     'filiere': _filiere,
-    'demande': _demande,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
 
-  static final amplify_core.QueryModelIdentifier<EtudiantModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<EtudiantModelIdentifier>();
+  static final amplify_core.QueryModelIdentifier<OperateurModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<OperateurModelIdentifier>();
   static final ID = amplify_core.QueryField(fieldName: "id");
   static final NOM = amplify_core.QueryField(fieldName: "nom");
   static final PRENOM = amplify_core.QueryField(fieldName: "prenom");
-  static final APOGEE = amplify_core.QueryField(fieldName: "apogee");
-  static final CIN = amplify_core.QueryField(fieldName: "cin");
-  static final CYCLE = amplify_core.QueryField(fieldName: "cycle");
   static final EMAIL = amplify_core.QueryField(fieldName: "email");
-  static final OWNER = amplify_core.QueryField(fieldName: "owner");
   static final FILIERE = amplify_core.QueryField(
     fieldName: "filiere",
     fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'Filiere'));
-  static final DEMANDE = amplify_core.QueryField(
-    fieldName: "demande",
-    fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'Demande'));
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Etudiant";
-    modelSchemaDefinition.pluralName = "Etudiants";
+    modelSchemaDefinition.name = "Operateur";
+    modelSchemaDefinition.pluralName = "Operateurs";
     
     modelSchemaDefinition.authRules = [
       amplify_core.AuthRule(
-        authStrategy: amplify_core.AuthStrategy.OWNER,
-        ownerField: "owner",
-        identityClaim: "cognito:username",
+        authStrategy: amplify_core.AuthStrategy.GROUPS,
+        groupClaim: "cognito:groups",
+        groups: [ "Operateurs" ],
         provider: amplify_core.AuthRuleProvider.USERPOOLS,
         operations: const [
-          amplify_core.ModelOperation.CREATE,
           amplify_core.ModelOperation.READ,
+          amplify_core.ModelOperation.CREATE,
           amplify_core.ModelOperation.UPDATE
-        ]),
-      amplify_core.AuthRule(
-        authStrategy: amplify_core.AuthStrategy.PUBLIC,
-        operations: const [
-          amplify_core.ModelOperation.CREATE
         ])
     ];
     
     modelSchemaDefinition.indexes = [
-      amplify_core.ModelIndex(fields: const ["apogee"], name: "byApogee"),
-      amplify_core.ModelIndex(fields: const ["cycle"], name: "byCycle"),
       amplify_core.ModelIndex(fields: const ["email"], name: "byEmail"),
-      amplify_core.ModelIndex(fields: const ["filiereId"], name: "byFiliereEtudiant")
+      amplify_core.ModelIndex(fields: const ["filiereId"], name: "byFiliereOperateur")
     ];
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.id());
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Etudiant.NOM,
+      key: Operateur.NOM,
       isRequired: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Etudiant.PRENOM,
+      key: Operateur.PRENOM,
       isRequired: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Etudiant.APOGEE,
+      key: Operateur.EMAIL,
       isRequired: true,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Etudiant.CIN,
-      isRequired: true,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Etudiant.CYCLE,
-      isRequired: true,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.enumeration)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Etudiant.EMAIL,
-      isRequired: true,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Etudiant.OWNER,
-      isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.belongsTo(
-      key: Etudiant.FILIERE,
+      key: Operateur.FILIERE,
       isRequired: false,
       targetNames: ['filiereId'],
       ofModelName: 'Filiere'
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.hasMany(
-      key: Etudiant.DEMANDE,
-      isRequired: false,
-      ofModelName: 'Demande',
-      associatedKey: Demande.ETUDIANT
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
@@ -417,29 +268,29 @@ class Etudiant extends amplify_core.Model {
   });
 }
 
-class _EtudiantModelType extends amplify_core.ModelType<Etudiant> {
-  const _EtudiantModelType();
+class _OperateurModelType extends amplify_core.ModelType<Operateur> {
+  const _OperateurModelType();
   
   @override
-  Etudiant fromJson(Map<String, dynamic> jsonData) {
-    return Etudiant.fromJson(jsonData);
+  Operateur fromJson(Map<String, dynamic> jsonData) {
+    return Operateur.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'Etudiant';
+    return 'Operateur';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [Etudiant] in your schema.
+ * of [Operateur] in your schema.
  */
-class EtudiantModelIdentifier implements amplify_core.ModelIdentifier<Etudiant> {
+class OperateurModelIdentifier implements amplify_core.ModelIdentifier<Operateur> {
   final String id;
 
-  /** Create an instance of EtudiantModelIdentifier using [id] the primary key. */
-  const EtudiantModelIdentifier({
+  /** Create an instance of OperateurModelIdentifier using [id] the primary key. */
+  const OperateurModelIdentifier({
     required this.id});
   
   @override
@@ -457,7 +308,7 @@ class EtudiantModelIdentifier implements amplify_core.ModelIdentifier<Etudiant> 
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'EtudiantModelIdentifier(id: $id)';
+  String toString() => 'OperateurModelIdentifier(id: $id)';
   
   @override
   bool operator ==(Object other) {
@@ -465,7 +316,7 @@ class EtudiantModelIdentifier implements amplify_core.ModelIdentifier<Etudiant> 
       return true;
     }
     
-    return other is EtudiantModelIdentifier &&
+    return other is OperateurModelIdentifier &&
       id == other.id;
   }
   

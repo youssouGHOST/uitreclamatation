@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
-
-class Demande extends StatelessWidget {
+import 'package:reclamation_uit/FormulaireDemande.dart';
+import 'package:reclamation_uit/models/ModelProvider.dart';
+import 'package:reclamation_uit/widget/CustomBottomNav.dart';
+class Demande extends StatefulWidget {
   const Demande({super.key});
 
+  @override
+  State<Demande> createState() => _DemandeState();
+}
+
+class _DemandeState extends State<Demande> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Types de demandes"),
         centerTitle: true,
-       backgroundColor: const Color.fromARGB(255, 47, 141, 255),
+        backgroundColor: const Color.fromARGB(255, 47, 141, 255),
         foregroundColor: Colors.white,
         elevation: 6,
       ),
@@ -28,49 +35,53 @@ class Demande extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-
-            // Liste des boutons de demande
             _buildDemandButton(
               context,
               "Justification d'absence",
               'assets/absence.png',
               Colors.deepPurple,
+              TypeDemande.ABSENCE,
             ),
             const SizedBox(height: 16),
             _buildDemandButton(
               context,
-              "changement de filière",
+              "Changement de filière",
               'assets/change.png',
               Colors.indigo,
+              TypeDemande.CHANGEMENTFILIERE,
             ),
             const SizedBox(height: 16),
             _buildDemandButton(
               context,
-              "  Ajout de module",
+              "Ajout de module",
               'assets/module.png',
               Colors.blue,
-            ),
-            const SizedBox(height: 16),
-            _buildDemandButton(
-              context,
-              "Anomalie d'inscription",
-              'assets/anom.png',
-              const Color.fromARGB(255, 6, 21, 243),
+              TypeDemande.AJOUTMODULE,
             ),
           ],
         ),
       ),
+            bottomNavigationBar: CustomBottomNav(), // ✅ insertion
+
     );
   }
 
-  Widget _buildDemandButton(BuildContext context, String title, String asset, Color color) {
+  Widget _buildDemandButton(
+    BuildContext context,
+    String title,
+    String asset,
+    Color color,
+    TypeDemande typeDemande,
+  ) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          // Naviguer vers un formulaire ou une autre page
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Demande : $title")),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => FormulaireDemande(typeDemande: typeDemande),
+            ),
           );
         },
         style: ElevatedButton.styleFrom(
@@ -104,7 +115,10 @@ class Demande extends StatelessWidget {
             ),
           ],
         ),
+        
       ),
+      
     );
+    
   }
 }
