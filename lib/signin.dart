@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+
 import 'package:provider/provider.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_api/amplify_api.dart';
@@ -25,7 +27,7 @@ class _SignInPageState extends State<SignInPage> {
   void _showTopFlushbar(String message) {
     Flushbar(
       message: message,
-      backgroundColor: const Color.fromARGB(255, 51, 4, 240),
+       backgroundColor: Colors.blue.shade400,
       duration: const Duration(seconds: 2),
       flushbarPosition: FlushbarPosition.TOP,
       margin: const EdgeInsets.all(20),
@@ -99,6 +101,28 @@ class _SignInPageState extends State<SignInPage> {
     setState(() => _isLoading = false);
   }
 
+
+//DECONNEXION TEMPORAIRE
+
+  Future<void> _signOut(BuildContext context) async {
+    try {
+      final result = await Amplify.Auth.signOut();
+
+      if (result is CognitoCompleteSignOut) {
+        safePrint("✅ Déconnexion réussie");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const SignInPage()),
+        );
+      } else if (result is CognitoFailedSignOut) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("⚠️ Erreur de déconnexion")),
+        );
+      }
+    } catch (e) {
+      safePrint("❌ Erreur lors de la déconnexion : $e");
+    }
+  }  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,7 +143,8 @@ class _SignInPageState extends State<SignInPage> {
                     const Text(
                       "Faculté des sciences",
                       style: TextStyle(
-                        color: Color.fromARGB(255, 39, 129, 255),
+                        color: Color.fromARGB(255, 41, 128, 250),                     
+
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Courier',
@@ -167,12 +192,30 @@ class _SignInPageState extends State<SignInPage> {
                                 style: FilledButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  backgroundColor: Colors.blue.shade400,
                                 ),
                                 child: _isLoading
                                     ? const CircularProgressIndicator(color: Colors.white)
                                     : const Text('Se connecter'),
                               ),
                             ),
+                            
+                            // ACTUALISER
+                                 const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 208, 194, 194),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  icon: const Icon(Icons.update, color: Colors.white, size: 18),
+                  label: const Text("", style: TextStyle(color: Colors.white)),
+                  onPressed: () => _signOut(context),
+                ),
+              ),
                           ],
                         ),
                       ),

@@ -78,12 +78,14 @@ class Filiere extends amplify_core.Model {
   
   const Filiere._internal({required this.id, required nomFiliere, operateur, etudiants, createdAt, updatedAt}): _nomFiliere = nomFiliere, _operateur = operateur, _etudiants = etudiants, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Filiere({String? id, required NomFiliere nomFiliere, Operateur? operateur, List<Etudiant>? etudiants}) {
+  factory Filiere({String? id, required NomFiliere nomFiliere, Operateur? operateur, List<Etudiant>? etudiants, amplify_core.TemporalDateTime? createdAt, amplify_core.TemporalDateTime? updatedAt}) {
     return Filiere._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       nomFiliere: nomFiliere,
       operateur: operateur,
-      etudiants: etudiants != null ? List<Etudiant>.unmodifiable(etudiants) : etudiants);
+      etudiants: etudiants != null ? List<Etudiant>.unmodifiable(etudiants) : etudiants,
+      createdAt: createdAt,
+      updatedAt: updatedAt);
   }
   
   bool equals(Object other) {
@@ -97,7 +99,9 @@ class Filiere extends amplify_core.Model {
       id == other.id &&
       _nomFiliere == other._nomFiliere &&
       _operateur == other._operateur &&
-      DeepCollectionEquality().equals(_etudiants, other._etudiants);
+      DeepCollectionEquality().equals(_etudiants, other._etudiants) &&
+      _createdAt == other._createdAt &&
+      _updatedAt == other._updatedAt;
   }
   
   @override
@@ -117,24 +121,30 @@ class Filiere extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Filiere copyWith({NomFiliere? nomFiliere, Operateur? operateur, List<Etudiant>? etudiants}) {
+  Filiere copyWith({NomFiliere? nomFiliere, Operateur? operateur, List<Etudiant>? etudiants, amplify_core.TemporalDateTime? createdAt, amplify_core.TemporalDateTime? updatedAt}) {
     return Filiere._internal(
       id: id,
       nomFiliere: nomFiliere ?? this.nomFiliere,
       operateur: operateur ?? this.operateur,
-      etudiants: etudiants ?? this.etudiants);
+      etudiants: etudiants ?? this.etudiants,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt);
   }
   
   Filiere copyWithModelFieldValues({
     ModelFieldValue<NomFiliere>? nomFiliere,
     ModelFieldValue<Operateur?>? operateur,
-    ModelFieldValue<List<Etudiant>?>? etudiants
+    ModelFieldValue<List<Etudiant>?>? etudiants,
+    ModelFieldValue<amplify_core.TemporalDateTime?>? createdAt,
+    ModelFieldValue<amplify_core.TemporalDateTime?>? updatedAt
   }) {
     return Filiere._internal(
       id: id,
       nomFiliere: nomFiliere == null ? this.nomFiliere : nomFiliere.value,
       operateur: operateur == null ? this.operateur : operateur.value,
-      etudiants: etudiants == null ? this.etudiants : etudiants.value
+      etudiants: etudiants == null ? this.etudiants : etudiants.value,
+      createdAt: createdAt == null ? this.createdAt : createdAt.value,
+      updatedAt: updatedAt == null ? this.updatedAt : updatedAt.value
     );
   }
   
@@ -184,6 +194,8 @@ class Filiere extends amplify_core.Model {
   static final ETUDIANTS = amplify_core.QueryField(
     fieldName: "etudiants",
     fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'Etudiant'));
+  static final CREATEDAT = amplify_core.QueryField(fieldName: "createdAt");
+  static final UPDATEDAT = amplify_core.QueryField(fieldName: "updatedAt");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "Filiere";
     modelSchemaDefinition.pluralName = "Filieres";
@@ -240,17 +252,15 @@ class Filiere extends amplify_core.Model {
       associatedKey: Etudiant.FILIERE
     ));
     
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
-      fieldName: 'createdAt',
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Filiere.CREATEDAT,
       isRequired: false,
-      isReadOnly: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)
     ));
     
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
-      fieldName: 'updatedAt',
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Filiere.UPDATEDAT,
       isRequired: false,
-      isReadOnly: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)
     ));
   });

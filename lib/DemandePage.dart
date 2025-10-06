@@ -30,7 +30,6 @@ class _DemandePageState extends State<DemandePage> {
         Demande.classType,
         where: Demande.ETUDIANT.eq(widget.etudiant.id),
       );
-
       final res = await Amplify.API.query(request: req).response;
 
       if (res.data != null) {
@@ -47,6 +46,40 @@ class _DemandePageState extends State<DemandePage> {
     }
   }
 
+  Future<void> _deleteDemande(Demande demande) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Supprimer la demande ?"),
+        content: const Text("Voulez-vous vraiment supprimer cette demande ?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Annuler"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Supprimer", style: TextStyle(color: Colors.white, fontSize: 16)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        final req = ModelMutations.delete(demande);
+        await Amplify.API.mutate(request: req).response;
+        setState(() => demandes.remove(demande));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Demande supprimée avec succès")),
+        );
+      } catch (e) {
+        safePrint("Erreur suppression: $e");
+      }
+    }
+  }
+
   void _logout() async {
     try {
       await Amplify.Auth.signOut();
@@ -55,17 +88,13 @@ class _DemandePageState extends State<DemandePage> {
     } catch (e) {
       safePrint("Erreur déconnexion: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur lors de la déconnexion")),
+        const SnackBar(content: Text("Erreur lors de la déconnexion")),
       );
     }
   }
-  
 
   @override
   Widget build(BuildContext context) {
-    
-
-    
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -92,27 +121,21 @@ class _DemandePageState extends State<DemandePage> {
   }
 
   Widget _buildProfileHeader() {
-    
-int nbAccepte = demandes.where((d) => d.status == Status.ACCEPTE).length;
-final nbRefus = demandes.where((d) => d.status == Status.REFUS).length;
-final nbEnCours = demandes.where((d) => d.status == Status.ENCOURS).length;
+    int nbAccepte = demandes.where((d) => d.status == Status.ACCEPTE).length;
+    int nbRefus = demandes.where((d) => d.status == Status.REFUS).length;
+    int nbEnCours = demandes.where((d) => d.status == Status.ENCOURS).length;
+
     return Column(
       children: [
         CircleAvatar(
-          radius: 50,
-          backgroundColor: Colors.blue.shade300,
-          child: const Icon(Icons.numbers, size: 20, color: Colors.white),
+          radius: 35,
+          backgroundImage: const AssetImage('assets/vdemande.png'),
         ),
         const SizedBox(height: 16),
-        Text("Nombre de demandes :  ${demandes.length}",
-        ),
-        Text("ACCEPTE : $nbAccepte "),
-        
-        Text("EN COURS  : $nbEnCours",
-        ),
-        Text("REFUSE : $nbRefus ",
-        ),
-      
+        Text("Nombre total de demandes : ${demandes.length}",
+            style: const TextStyle(fontWeight: FontWeight.w500)),
+        Text("Acceptées : $nbAccepte  |  En cours : $nbEnCours  |  Refusées : $nbRefus",
+            style: const TextStyle(color: Colors.black54, fontSize: 13)),
       ],
     );
   }
@@ -135,36 +158,50 @@ final nbEnCours = demandes.where((d) => d.status == Status.ENCOURS).length;
       itemCount: demandes.length,
       itemBuilder: (context, index) {
         final demande = demandes[index];
+
         return Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           elevation: 3,
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-          child: ListTile(
+          child: ExpansionTile(
             leading: _iconForType(demande.typeDemande),
             title: Text(
               _titleForType(demande.typeDemande),
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
             ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (demande.commentaire != null && demande.commentaire!.isNotEmpty)
-                  Text(demande.commentaire!),
-                const SizedBox(height: 4),
+            subtitle: Text(
+              "Statut: ${demande.status.name}",
+              style: TextStyle(
+                color: demande.status == Status.ACCEPTE
+                    ? Colors.green
+                    : demande.status == Status.REFUS
+                        ? Colors.red
+                        : Colors.orange,
+              ),
+            ),
+            childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            children: [
+              if (demande.commentaire != null && demande.commentaire!.isNotEmpty)
                 Text(
-                  "Statut: ${demande.status.name}",
-                  style: TextStyle(
-                    color: demande.status == Status.ACCEPTE
-                        ? Colors.green
-                        : demande.status == Status.REFUS
-                            ? Colors.red
-                            : Colors.orange,
-                    fontWeight: FontWeight.w100,
-                  ),
+                  "Commentaire : ${demande.commentaire!}",
+                  style: const TextStyle(color: Colors.black87),
                 ),
-              ],
-            ),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  icon: const Icon(Icons.delete, color: Colors.white, size: 18),
+                  label: const Text("Supprimer", style: TextStyle(color: Colors.white)),
+                  onPressed: () => _deleteDemande(demande),
+                ),
+              ),
+            ],
           ),
         );
       },

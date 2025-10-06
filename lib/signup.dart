@@ -21,7 +21,6 @@ class _SignUpPageState extends State<SignUpPage> {
   String cin = '';
   Cycle? cycle;
   Filiere? selectedFiliere;
-
   bool _obscurePassword = true;
   bool _isLoading = false;
   bool isLoadingFilieres = true;
@@ -38,7 +37,9 @@ class _SignUpPageState extends State<SignUpPage> {
     try {
       final request = ModelQueries.list(
         Filiere.classType,
-        authorizationMode: APIAuthorizationType.apiKey, // 🔹 lecture publique
+        authorizationMode: APIAuthorizationType.apiKey, 
+        apiName: "reclamationuit",
+        // 
       );
 
       final response = await Amplify.API.query(request: request).response;
@@ -53,6 +54,7 @@ class _SignUpPageState extends State<SignUpPage> {
         setState(() => isLoadingFilieres = false);
       }
     } catch (e) {
+
       safePrint("Erreur récupération filières : $e");
       setState(() => isLoadingFilieres = false);
     }

@@ -80,10 +80,10 @@ class _HomePageState extends State<HomePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset('assets/demande.png', width: 48, height: 48),
+                        Image.asset('assets/vdemande.png', width: 48, height: 48),
                         const SizedBox(width: 12),
                         const Text(
-                          "Faire une demande",
+                          "voir mes demandes",
                           style: TextStyle(
                             fontSize: 18,
                             shadows: [
@@ -119,9 +119,9 @@ class _HomePageState extends State<HomePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset('assets/vdemande.png', width: 48, height: 48),
+                        Image.asset('assets/demande.png', width: 48, height: 48),
                         const SizedBox(width: 12),
-                        const Text("Voir mes demandes", style: TextStyle(fontSize: 18)),
+                        const Text("faire une demande", style: TextStyle(fontSize: 18)),
                       ],
                     ),
                   ),

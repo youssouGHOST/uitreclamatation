@@ -28,7 +28,8 @@ type Filiere @model  @auth(rules: [
   nomFiliere: NomFiliere! @index(name: "byNomFiliere",queryField: "nomFiliere")
   operateur: Operateur @hasOne(fields: ["id"])
   etudiants: [Etudiant] @hasMany( fields: ["id"])
-
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
 
 
 }
