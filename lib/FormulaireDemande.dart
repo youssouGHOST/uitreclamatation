@@ -5,11 +5,12 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:reclamation_uit/models/ModelProvider.dart';
 import 'package:reclamation_uit/widget/CustomBottomNav.dart';
 import 'provider/EtudiantProvider.dart';
+import 'service/StorageService.dart';
 
 class FormulaireDemande extends StatefulWidget {
-    final TypeDemande typeDemande;
+  final TypeDemande typeDemande;
 
-    const FormulaireDemande({super.key , required this.typeDemande});
+  const FormulaireDemande({super.key, required this.typeDemande});
 
   @override
   State<FormulaireDemande> createState() => _FormulaireDemandeState();
@@ -17,57 +18,58 @@ class FormulaireDemande extends StatefulWidget {
 
 class _FormulaireDemandeState extends State<FormulaireDemande> {
   final TextEditingController _commentaireController = TextEditingController();
-  bool _loading = false;
+  final TextEditingController _moduleController = TextEditingController();
 
-  late TypeDemande typeDemande; // Le type reçu depuis la page précédente
+  bool _loading = false;
+  String? _fileName;
+  String? _justificationUrl;
+
+  late TypeDemande typeDemande;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Récupération du type passé en argument via Navigator
     final args = ModalRoute.of(context)!.settings.arguments;
-    if (args != null && args is TypeDemande) {
-      typeDemande = args;
-    } else {
-      // Valeur par défaut si rien n'est passé
-      typeDemande = TypeDemande.ABSENCE;
+    typeDemande = (args is TypeDemande) ? args : TypeDemande.ABSENCE;
+  }
+
+  Future<void> _choisirJustificatif() async {
+    final url = await StorageService.uploadJustification();
+    if (url != null) {
+      setState(() {
+        _justificationUrl = url;
+        _fileName = url.split("/").last;
+      });
     }
   }
 
-  /// Fonction pour envoyer la demande à DynamoDB
   Future<void> _envoyerDemande() async {
     setState(() => _loading = true);
 
     try {
-      // Récupération de l'étudiant connecté via Provider
       final etudiant = Provider.of<EtudiantProvider>(context, listen: false).etudiant;
+      if (etudiant == null) throw Exception("Aucun étudiant connecté");
 
-      if (etudiant == null) {
-        throw Exception("Aucun étudiant connecté");
-      }
-
-      // Création de l'objet Demande
       final demande = Demande(
         typeDemande: typeDemande,
-        status: Status.ENCOURS, // statut par défaut
+        status: Status.ENCOURS,
         commentaire: _commentaireController.text.trim(),
+        module: _moduleController.text.trim(),
+        justificationUrl: _justificationUrl,
         etudiant: etudiant,
       );
 
-      // Envoi à DynamoDB via Amplify
       final request = ModelMutations.create(demande);
       final response = await Amplify.API.mutate(request: request).response;
 
       if (response.data != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("✅ Demande créée avec succès")),
+          const SnackBar(content: Text("✔ Demande envoyée")),
         );
-        Navigator.pop(context); // retour à la page précédente
-      } else {
-        throw Exception("Erreur lors de la création : ${response.errors}");
+        Navigator.pop(context);
       }
     } catch (e) {
-      safePrint("Erreur création demande : $e");
+      safePrint("Erreur: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("❌ Erreur : $e")),
       );
@@ -81,49 +83,164 @@ class _FormulaireDemandeState extends State<FormulaireDemande> {
     final typeText = typeDemande.name.replaceAll("_", " ").toLowerCase();
 
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text("Nouvelle demande"),
-        backgroundColor: Colors.blue,
+        title: const Text("Nouvelle Demande"),
+        centerTitle: true,
+        elevation: 3,
+        backgroundColor: const Color(0xFF2F8DFF),
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Affichage du type sélectionné
-            Text(
-              "Type de demande : ${typeText[0].toUpperCase()}${typeText.substring(1)}",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-
-            // Champ pour le commentaire
-            TextField(
-              controller: _commentaireController,
-              maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: "Commentaire / Motif",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Bouton d'envoi
-            ElevatedButton(
-              onPressed: _loading ? null : _envoyerDemande,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                backgroundColor: Colors.blue,
-              ),
-              child: _loading
-                  ? const CircularProgressIndicator(color: Color.fromARGB(255, 255, 255, 255))
-                  : const Text("Envoyer la demande", style: TextStyle(fontSize: 16)),
-            ),
-          ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              _header(typeText),
+              const SizedBox(height: 20),
+              _inputCard(),
+              const SizedBox(height: 15),
+              _justificatifCard(),
+              const SizedBox(height: 25),
+              _submitButton(),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: CustomBottomNav(),
+    );
+  }
+
+  // -------------------------------
+  // HEADER MODERNE
+  // -------------------------------
+  Widget _header(String typeText) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 10, spreadRadius: 1),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.assignment, size: 40, color: Color(0xFF2F8DFF)),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Text(
+              "Type : ${typeText[0].toUpperCase()}${typeText.substring(1)}",
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // -------------------------------
+  // FORMULAIRE STYLÉ
+  // -------------------------------
+  Widget _inputCard() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 8, spreadRadius: 1),
+        ],
+      ),
+      child: Column(
+        children: [
+          TextField(
+            controller: _commentaireController,
+            maxLines: 4,
+            decoration: InputDecoration(
+              labelText: "Motif",
+              labelStyle: TextStyle(color: Colors.grey[700]),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+          const SizedBox(height: 20),
+          TextField(
+            controller: _moduleController,
+            decoration: InputDecoration(
+              labelText: "Module",
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // -------------------------------
+  // JUSTIFICATIF SECTION
+  // -------------------------------
+  Widget _justificatifCard() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 8, spreadRadius: 1),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ElevatedButton.icon(
+            onPressed: _choisirJustificatif,
+            icon: const Icon(Icons.attach_file, color: Colors.white),
+            label: const Text("Joindre un justificatif"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue.shade600,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          if (_fileName != null) ...[
+            const SizedBox(height: 10),
+            Text(
+              "📎 Fichier ajouté : $_fileName",
+              style: const TextStyle(
+                fontSize: 14,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // -------------------------------
+  // BOUTON D’ENVOI
+  // -------------------------------
+  Widget _submitButton() {
+    return ElevatedButton(
+      onPressed: _loading ? null : _envoyerDemande,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF2F8DFF),
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+      ),
+      child: _loading
+          ? const CircularProgressIndicator(color: Colors.white)
+          : const Text(
+              "Envoyer la demande",
+              style: TextStyle(color: Colors.white, fontSize: 17),
+            ),
     );
   }
 }

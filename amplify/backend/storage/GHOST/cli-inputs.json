@@ -1,0 +1,14 @@
+{
+  "resourceName": "GHOST",
+  "policyUUID": "b22db485",
+  "bucketName": "reclamationuit",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}

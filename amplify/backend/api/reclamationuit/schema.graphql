@@ -57,11 +57,13 @@ type Demande @model @auth(rules: [
   etudiant: Etudiant @belongsTo(fields:["etudiantId"]) 
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
+  dateAbsence:AWSDateTime
+  justificationUrl: AWSURL # 👈 Nouveau champ pour le lien du fichier S3
+
+  module:String 
 
 
 }
-
-
 
 
 

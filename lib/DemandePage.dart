@@ -36,11 +36,9 @@ class _DemandePageState extends State<DemandePage> {
         setState(() {
           demandes = res.data!.items.whereType<Demande>().toList();
         });
-      } else {
-        safePrint("Erreur GraphQL: ${res.errors}");
       }
     } catch (e) {
-      safePrint("Erreur fetch demandes: $e");
+      safePrint("Erreur: $e");
     } finally {
       setState(() => isLoading = false);
     }
@@ -51,7 +49,7 @@ class _DemandePageState extends State<DemandePage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Supprimer la demande ?"),
-        content: const Text("Voulez-vous vraiment supprimer cette demande ?"),
+        content: const Text("Êtes-vous sûr de vouloir supprimer cette demande ?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -60,7 +58,7 @@ class _DemandePageState extends State<DemandePage> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text("Supprimer", style: TextStyle(color: Colors.white, fontSize: 16)),
+            child: const Text("Supprimer", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -68,29 +66,42 @@ class _DemandePageState extends State<DemandePage> {
 
     if (confirm == true) {
       try {
-        final req = ModelMutations.delete(demande);
-        await Amplify.API.mutate(request: req).response;
+        await Amplify.API.mutate(request: ModelMutations.delete(demande)).response;
         setState(() => demandes.remove(demande));
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Demande supprimée avec succès")),
-        );
-      } catch (e) {
-        safePrint("Erreur suppression: $e");
-      }
+      } catch (_) {}
     }
   }
 
-  void _logout() async {
-    try {
-      await Amplify.Auth.signOut();
-      if (!mounted) return;
-      Navigator.of(context).popUntil((route) => route.isFirst);
-    } catch (e) {
-      safePrint("Erreur déconnexion: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Erreur lors de la déconnexion")),
-      );
+  Widget _statusChip(Status status) {
+    Color color;
+    String label;
+
+    switch (status) {
+      case Status.ACCEPTE:
+        color = Colors.green;
+        label = "Acceptée";
+        break;
+      case Status.REFUS:
+        color = Colors.red;
+        label = "Refusée";
+        break;
+      case Status.ENCOURS:
+      default:
+        color = Colors.orange;
+        label = "En cours";
     }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(.15),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: color, fontWeight: FontWeight.w600),
+      ),
+    );
   }
 
   @override
@@ -100,19 +111,19 @@ class _DemandePageState extends State<DemandePage> {
       appBar: AppBar(
         title: const Text("Mes Demandes"),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 47, 141, 255),
+        backgroundColor: const Color(0xFF2F8DFF),
         foregroundColor: Colors.white,
-        elevation: 4,
+        elevation: 3,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _buildProfileHeader(),
-            const SizedBox(height: 24),
+            _header(),
+            const SizedBox(height: 20),
             Expanded(child: _buildDemandesList()),
-            const SizedBox(height: 16),
-            _buildLogoutButton(),
+            const SizedBox(height: 20),
+            _logoutButton(),
           ],
         ),
       ),
@@ -120,23 +131,42 @@ class _DemandePageState extends State<DemandePage> {
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _header() {
     int nbAccepte = demandes.where((d) => d.status == Status.ACCEPTE).length;
     int nbRefus = demandes.where((d) => d.status == Status.REFUS).length;
     int nbEnCours = demandes.where((d) => d.status == Status.ENCOURS).length;
 
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 35,
-          backgroundImage: const AssetImage('assets/vdemande.png'),
-        ),
-        const SizedBox(height: 16),
-        Text("Nombre total de demandes : ${demandes.length}",
-            style: const TextStyle(fontWeight: FontWeight.w500)),
-        Text("Acceptées : $nbAccepte  |  En cours : $nbEnCours  |  Refusées : $nbRefus",
-            style: const TextStyle(color: Colors.black54, fontSize: 13)),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8,
+            spreadRadius: 2,
+          )
+        ],
+      ),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 35,
+            backgroundImage: const AssetImage('assets/vdemande.png'),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            "Total demandes : ${demandes.length}",
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            "Acceptées : $nbAccepte  •  En cours : $nbEnCours  •  Refusées : $nbRefus",
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+          ),
+        ],
+      ),
     );
   }
 
@@ -160,80 +190,95 @@ class _DemandePageState extends State<DemandePage> {
         final demande = demandes[index];
 
         return Card(
+          elevation: 2,
+          margin: const EdgeInsets.symmetric(vertical: 8),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          elevation: 3,
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-          child: ExpansionTile(
-            leading: _iconForType(demande.typeDemande),
-            title: Text(
-              _titleForType(demande.typeDemande),
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-            ),
-            subtitle: Text(
-              "Statut: ${demande.status.name}",
-              style: TextStyle(
-                color: demande.status == Status.ACCEPTE
-                    ? Colors.green
-                    : demande.status == Status.REFUS
-                        ? Colors.red
-                        : Colors.orange,
-              ),
-            ),
-            childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            children: [
-              if (demande.commentaire != null && demande.commentaire!.isNotEmpty)
-                Text(
-                  "Commentaire : ${demande.commentaire!}",
-                  style: const TextStyle(color: Colors.black87),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    _iconForType(demande.typeDemande),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _titleForType(demande.typeDemande),
+                        style: const TextStyle(
+                            fontSize: 17, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    _statusChip(demande.status),
+                  ],
                 ),
-              const SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                const SizedBox(height: 12),
+                if (demande.commentaire != null &&
+                    demande.commentaire!.isNotEmpty)
+                  Text(
+                    "Commentaire : ${demande.commentaire}",
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                if (demande.module != null && demande.module!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      "Module : ${demande.module}",
+                      style: const TextStyle(fontSize: 14),
                     ),
                   ),
-                  icon: const Icon(Icons.delete, color: Colors.white, size: 18),
-                  label: const Text("Supprimer", style: TextStyle(color: Colors.white)),
-                  onPressed: () => _deleteDemande(demande),
-                ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    icon: const Icon(Icons.delete, color: Colors.white),
+                    label: const Text("Supprimer",
+                        style: TextStyle(color: Colors.white)),
+                    onPressed: () => _deleteDemande(demande),
+                  ),
+                )
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _buildLogoutButton() {
+  Widget _logoutButton() {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blue.shade700,
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 26),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
-      onPressed: _logout,
+      onPressed: () async {
+        await Amplify.Auth.signOut();
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      },
       icon: const Icon(Icons.logout, color: Colors.white),
-      label: const Text(
-        "Déconnexion",
-        style: TextStyle(color: Colors.white, fontSize: 16),
-      ),
+      label: const Text("Déconnexion",
+          style: TextStyle(color: Colors.white, fontSize: 16)),
     );
   }
 
   Widget _iconForType(TypeDemande? type) {
     switch (type) {
       case TypeDemande.ABSENCE:
-        return const Icon(Icons.event_busy, color: Colors.deepPurple);
+        return Image.asset('assets/absence.png', width: 30);
       case TypeDemande.CHANGEMENTFILIERE:
-        return const Icon(Icons.swap_horiz, color: Colors.indigo);
+        return const Icon(Icons.swap_horiz, color: Colors.indigo, size: 30);
       case TypeDemande.AJOUTMODULE:
-        return const Icon(Icons.add_box, color: Colors.blue);
+        return const Icon(Icons.add_box, color: Colors.blue, size: 30);
       default:
-        return const Icon(Icons.help_outline, color: Colors.grey);
+        return const Icon(Icons.help_outline, color: Colors.grey, size: 30);
     }
   }
 

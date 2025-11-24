@@ -36,7 +36,7 @@ export 'TypeDemande.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "b93daea323e2100a9e3ad591ae760e65";
+  String version = "31beaa48b1abc6b62ebbbb707c56e47d";
   @override
   List<amplify_core.ModelSchema> modelSchemas = [Demande.schema, Etudiant.schema, Filiere.schema, Operateur.schema];
   @override

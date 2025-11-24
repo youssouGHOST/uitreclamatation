@@ -17,6 +17,9 @@
       },
       "api": {
         "reclamationuit": {}
+      },
+      "storage": {
+        "GHOST": {}
       }
     }
   }

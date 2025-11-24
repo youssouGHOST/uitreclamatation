@@ -7,66 +7,130 @@ class Profil extends StatefulWidget {
   const Profil({super.key});
 
   @override
-  State<Profil> createState() => _Profil();
+  State<Profil> createState() => _ProfilState();
 }
 
-class _Profil extends State<Profil> {
+class _ProfilState extends State<Profil> {
   @override
   Widget build(BuildContext context) {
     final etudiant = Provider.of<EtudiantProvider>(context).etudiant;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text("Mon Profil"),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 47, 141, 255),
+        elevation: 3,
+        backgroundColor: const Color(0xFF2F8DFF),
         foregroundColor: Colors.white,
-
-        elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Avatar circulaire
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.blue.shade200,
-              child: Icon(Icons.person, size: 60, color: Colors.white),
-            ),
-            const SizedBox(height: 20),
 
-            // Carte infos
-            _buildInfoCard("Nom", etudiant?.nom ?? ''),
-            _buildInfoCard("Prénom", etudiant?.prenom ?? ''),
-            _buildInfoCard("Numéro Apogée", etudiant?.apogee ?? ''),
-            _buildInfoCard("Filière", etudiant?.filiere?.nomFiliere.name ?? ''),
-            _buildInfoCard("Cycle", etudiant?.cycle.name ?? ''),
-            _buildInfoCard("Email", etudiant?.email ?? ''),
-
-
-            // Bouton Déconnexion
-
-          ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              _header(),
+              const SizedBox(height: 20),
+              _infoCard("Nom", etudiant?.nom ?? ""),
+              _infoCard("Prénom", etudiant?.prenom ?? ""),
+              _infoCard("Numéro Apogée", etudiant?.apogee ?? ""),
+              _infoCard("Filière", etudiant?.filiere?.nomFiliere.name ?? ""),
+              _infoCard("Cycle", etudiant?.cycle.name ?? ""),
+              _infoCard("Email", etudiant?.email ?? ""),
+            ],
+          ),
         ),
-        
       ),
-      bottomNavigationBar: CustomBottomNav(), // ✅ insertion
-
+      bottomNavigationBar: CustomBottomNav(),
     );
   }
 
-  Widget _buildInfoCard(String title, String value) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
+  // -------------------------------
+  // HEADER AVEC AVATAR (même style)
+  // -------------------------------
+  Widget _header() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: Colors.blue.shade200,
+            child: const Icon(Icons.person, size: 50, color: Colors.white),
+          ),
+          const SizedBox(width: 20),
+          const Expanded(
+            child: Text(
+              "Informations personnelles",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // -------------------------------
+  // INFO CARD MODERNE (même style)
+  // -------------------------------
+  Widget _infoCard(String title, String value) {
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        leading: Icon(Icons.info_outline, color: Colors.blue.shade700),
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade900)),
-        subtitle: Text(value, style: const TextStyle(fontSize: 16, color: Colors.black87)),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, color: Colors.blue.shade700, size: 28),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade900,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

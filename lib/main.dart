@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_api/amplify_api.dart';
-
+import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'models/ModelProvider.dart';
 import 'provider/EtudiantProvider.dart';
 import 'amplifyconfiguration.dart';
@@ -28,7 +28,8 @@ Future<void> _configureAmplify() async {
     final api = AmplifyAPI(options: APIPluginOptions(modelProvider: ModelProvider.instance));
     await Amplify.addPlugins([
       api,
-      AmplifyAuthCognito(),
+          AmplifyStorageS3(),
+         AmplifyAuthCognito(),
     ]);
     await Amplify.configure(amplifyconfig);
   } catch (e) {
