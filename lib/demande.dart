@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:reclamation_uit/FormulaireDemande.dart';
+import 'package:reclamation_uit/FormulaireAbsence.dart';
 import 'package:reclamation_uit/models/ModelProvider.dart';
+import 'package:reclamation_uit/DemandeAttestation.dart';
+
 import 'package:reclamation_uit/widget/CustomBottomNav.dart';
 class Demande extends StatefulWidget {
   const Demande({super.key});
@@ -40,24 +42,17 @@ class _DemandeState extends State<Demande> {
               "Justification d'absence",
               'assets/absence.png',
               Colors.deepPurple,
-              TypeDemande.ABSENCE,
-            ),
+            const  FormulaireAbsence(),    
+               ),
             const SizedBox(height: 16),
             _buildDemandButton(
               context,
-              "Changement de filière",
+              "Attestation d'inscription",
               'assets/change.png',
               Colors.indigo,
-              TypeDemande.CHANGEMENTFILIERE,
+              const DemandeAttestation(),
             ),
-            const SizedBox(height: 16),
-            _buildDemandButton(
-              context,
-              "Ajout de module",
-              'assets/module.png',
-              Colors.blue,
-              TypeDemande.AJOUTMODULE,
-            ),
+           
           ],
         ),
       ),
@@ -71,7 +66,7 @@ class _DemandeState extends State<Demande> {
     String title,
     String asset,
     Color color,
-    TypeDemande typeDemande,
+    Widget destinationPage,
   ) {
     return SizedBox(
       width: double.infinity,
@@ -80,8 +75,7 @@ class _DemandeState extends State<Demande> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => FormulaireDemande(typeDemande: typeDemande),
-            ),
+              builder: (_) => destinationPage),
           );
         },
         style: ElevatedButton.styleFrom(

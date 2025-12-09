@@ -7,31 +7,20 @@ import 'package:reclamation_uit/widget/CustomBottomNav.dart';
 import 'provider/EtudiantProvider.dart';
 import 'service/StorageService.dart';
 
-class FormulaireDemande extends StatefulWidget {
-  final TypeDemande typeDemande;
-
-  const FormulaireDemande({super.key, required this.typeDemande});
+class FormulaireAbsence extends StatefulWidget {
+  const FormulaireAbsence({super.key});
 
   @override
-  State<FormulaireDemande> createState() => _FormulaireDemandeState();
+  State<FormulaireAbsence> createState() => _FormulaireAbsenceState();
 }
 
-class _FormulaireDemandeState extends State<FormulaireDemande> {
+class _FormulaireAbsenceState extends State<FormulaireAbsence> {
   final TextEditingController _commentaireController = TextEditingController();
   final TextEditingController _moduleController = TextEditingController();
 
   bool _loading = false;
   String? _fileName;
   String? _justificationUrl;
-
-  late TypeDemande typeDemande;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final args = ModalRoute.of(context)!.settings.arguments;
-    typeDemande = (args is TypeDemande) ? args : TypeDemande.ABSENCE;
-  }
 
   Future<void> _choisirJustificatif() async {
     final url = await StorageService.uploadJustification();
@@ -43,28 +32,28 @@ class _FormulaireDemandeState extends State<FormulaireDemande> {
     }
   }
 
-  Future<void> _envoyerDemande() async {
+  Future<void> _envoyerAbsence() async {
     setState(() => _loading = true);
 
     try {
       final etudiant = Provider.of<EtudiantProvider>(context, listen: false).etudiant;
       if (etudiant == null) throw Exception("Aucun étudiant connecté");
 
-      final demande = Demande(
-        typeDemande: typeDemande,
+      final absence = Absence(
         status: Status.ENCOURS,
         commentaire: _commentaireController.text.trim(),
         module: _moduleController.text.trim(),
         justificationUrl: _justificationUrl,
+        dateAbsence: TemporalDateTime(DateTime.now()),
         etudiant: etudiant,
       );
 
-      final request = ModelMutations.create(demande);
+      final request = ModelMutations.create(absence);
       final response = await Amplify.API.mutate(request: request).response;
 
       if (response.data != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("✔ Demande envoyée")),
+          const SnackBar(content: Text("✔ Absence envoyée")),
         );
         Navigator.pop(context);
       }
@@ -80,12 +69,10 @@ class _FormulaireDemandeState extends State<FormulaireDemande> {
 
   @override
   Widget build(BuildContext context) {
-    final typeText = typeDemande.name.replaceAll("_", " ").toLowerCase();
-
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text("Nouvelle Demande"),
+        title: const Text("Déclaration d’absence"),
         centerTitle: true,
         elevation: 3,
         backgroundColor: const Color(0xFF2F8DFF),
@@ -96,8 +83,6 @@ class _FormulaireDemandeState extends State<FormulaireDemande> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              _header(typeText),
-              const SizedBox(height: 20),
               _inputCard(),
               const SizedBox(height: 15),
               _justificatifCard(),
@@ -111,40 +96,6 @@ class _FormulaireDemandeState extends State<FormulaireDemande> {
     );
   }
 
-  // -------------------------------
-  // HEADER MODERNE
-  // -------------------------------
-  Widget _header(String typeText) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 10, spreadRadius: 1),
-        ],
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.assignment, size: 40, color: Color(0xFF2F8DFF)),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Text(
-              "Type : ${typeText[0].toUpperCase()}${typeText.substring(1)}",
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // -------------------------------
-  // FORMULAIRE STYLÉ
-  // -------------------------------
   Widget _inputCard() {
     return Container(
       padding: const EdgeInsets.all(18),
@@ -161,8 +112,7 @@ class _FormulaireDemandeState extends State<FormulaireDemande> {
             controller: _commentaireController,
             maxLines: 4,
             decoration: InputDecoration(
-              labelText: "Motif",
-              labelStyle: TextStyle(color: Colors.grey[700]),
+              labelText: "Motif d’absence",
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
@@ -179,9 +129,6 @@ class _FormulaireDemandeState extends State<FormulaireDemande> {
     );
   }
 
-  // -------------------------------
-  // JUSTIFICATIF SECTION
-  // -------------------------------
   Widget _justificatifCard() {
     return Container(
       padding: const EdgeInsets.all(18),
@@ -211,10 +158,7 @@ class _FormulaireDemandeState extends State<FormulaireDemande> {
             const SizedBox(height: 10),
             Text(
               "📎 Fichier ajouté : $_fileName",
-              style: const TextStyle(
-                fontSize: 14,
-                fontStyle: FontStyle.italic,
-              ),
+              style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
             ),
           ],
         ],
@@ -222,12 +166,9 @@ class _FormulaireDemandeState extends State<FormulaireDemande> {
     );
   }
 
-  // -------------------------------
-  // BOUTON D’ENVOI
-  // -------------------------------
   Widget _submitButton() {
     return ElevatedButton(
-      onPressed: _loading ? null : _envoyerDemande,
+      onPressed: _loading ? null : _envoyerAbsence,
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF2F8DFF),
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
@@ -238,7 +179,7 @@ class _FormulaireDemandeState extends State<FormulaireDemande> {
       child: _loading
           ? const CircularProgressIndicator(color: Colors.white)
           : const Text(
-              "Envoyer la demande",
+              "Envoyer l’absence",
               style: TextStyle(color: Colors.white, fontSize: 17),
             ),
     );

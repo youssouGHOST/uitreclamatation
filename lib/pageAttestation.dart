@@ -4,19 +4,17 @@ import 'package:reclamation_uit/models/ModelProvider.dart';
 import 'package:reclamation_uit/widget/CustomBottomNav.dart';
 import 'package:amplify_api/amplify_api.dart';
 
-
-class DemandePage extends StatefulWidget {
+class PageAttestation extends StatefulWidget {
   final Etudiant etudiant;
 
-  const DemandePage({super.key, required this.etudiant});
+  const PageAttestation({super.key, required this.etudiant});
 
   @override
-  State<DemandePage> createState() => _DemandePageState();
+  State<PageAttestation> createState() => _PageAttestationState();
 }
 
-class _DemandePageState extends State<DemandePage> {
-  
-  List<Absence> demandes = [];
+class _PageAttestationState extends State<PageAttestation> {
+  List<AttestationInscription> demandes = [];
   bool isLoading = true;
 
   @override
@@ -29,14 +27,15 @@ class _DemandePageState extends State<DemandePage> {
     setState(() => isLoading = true);
     try {
       final req = ModelQueries.list(
-        Absence.classType,
-        where: Absence.ETUDIANT.eq(widget.etudiant.id),
+        AttestationInscription.classType,
+        where: AttestationInscription.ETUDIANT.eq(widget.etudiant.id),
       );
       final res = await Amplify.API.query(request: req).response;
 
       if (res.data != null) {
         setState(() {
-          demandes = res.data!.items.whereType<Absence>().toList();
+          demandes =
+              res.data!.items.whereType<AttestationInscription>().toList();
         });
       }
     } catch (e) {
@@ -46,12 +45,13 @@ class _DemandePageState extends State<DemandePage> {
     }
   }
 
-  Future<void> _deleteDemande(Absence demande) async {
+  Future<void> _deleteDemande(AttestationInscription demande) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Supprimer l'absence ?"),
-        content: const Text("Êtes-vous sûr de vouloir supprimer l'absence ?"),
+        title: const Text("Supprimer l'attestation ?"),
+        content:
+            const Text("Êtes-vous sûr de vouloir supprimer cette demande ?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -60,7 +60,8 @@ class _DemandePageState extends State<DemandePage> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text("Supprimer", style: TextStyle(color: Colors.white)),
+            child:
+                const Text("Supprimer", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -68,7 +69,9 @@ class _DemandePageState extends State<DemandePage> {
 
     if (confirm == true) {
       try {
-        await Amplify.API.mutate(request: ModelMutations.delete(demande)).response;
+        await Amplify.API
+            .mutate(request: ModelMutations.delete(demande))
+            .response;
         setState(() => demandes.remove(demande));
       } catch (_) {}
     }
@@ -81,7 +84,7 @@ class _DemandePageState extends State<DemandePage> {
     switch (status) {
       case Status.ACCEPTE:
         color = Colors.green;
-        label = "Acceptée";
+        label = "Disponible à la scolarité";
         break;
       case Status.REFUS:
         color = Colors.red;
@@ -94,7 +97,7 @@ class _DemandePageState extends State<DemandePage> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(.15),
         borderRadius: BorderRadius.circular(20),
@@ -111,7 +114,7 @@ class _DemandePageState extends State<DemandePage> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text("Mes Absences"),
+        title: const Text("Attestation d'inscription"),
         centerTitle: true,
         backgroundColor: const Color(0xFF2F8DFF),
         foregroundColor: Colors.white,
@@ -159,12 +162,12 @@ class _DemandePageState extends State<DemandePage> {
           ),
           const SizedBox(height: 12),
           Text(
-            "Total Absence : ${demandes.length}",
+            "Total demandes : ${demandes.length}",
             style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 6),
           Text(
-            "Acceptées : $nbAccepte  •  En cours : $nbEnCours  •  Refusées : $nbRefus",
+            "Validées : $nbAccepte  •  En cours : $nbEnCours  •  Refusées : $nbRefus",
             style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
           ),
         ],
@@ -180,7 +183,7 @@ class _DemandePageState extends State<DemandePage> {
     if (demandes.isEmpty) {
       return const Center(
         child: Text(
-          "Aucune justification d'absence pour le moment.",
+          "Aucune demande d'attestation pour le moment.",
           style: TextStyle(fontSize: 16, color: Colors.black54),
         ),
       );
@@ -202,28 +205,38 @@ class _DemandePageState extends State<DemandePage> {
               children: [
                 Row(
                   children: [
-                 //   _iconForType(demande.typeDemande),
+                    const Icon(Icons.school, color: Colors.blue, size: 30),
                     const SizedBox(width: 12),
-               
                     _statusChip(demande.status),
                   ],
                 ),
+
                 const SizedBox(height: 12),
-                if (demande.commentaire != null &&
-                    demande.commentaire!.isNotEmpty)
-                  Text(
-                    "Commentaire : ${demande.commentaire}",
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                if (demande.module != null && demande.module!.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Text(
-                      "Module : ${demande.module}",
-                      style: const TextStyle(fontSize: 14),
+
+                // 🔵 BOUTON "GÉNÉRER L'ATTESTATION"
+                if (demande.status == Status.ACCEPTE)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade600,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 18, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                      icon: const Icon(Icons.picture_as_pdf,
+                          color: Colors.white),
+                      label: const Text("Générer attestation",
+                          style: TextStyle(color: Colors.white)),
+                      onPressed: () {
+                        // 👉 ici tu appelles ton service PDF
+                      },
                     ),
                   ),
-                const SizedBox(height: 12),
+
+                const SizedBox(height: 10),
+
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton.icon(
@@ -264,32 +277,4 @@ class _DemandePageState extends State<DemandePage> {
           style: TextStyle(color: Colors.white, fontSize: 16)),
     );
   }
-/*
-  Widget _iconForType(TypeDemande? type) {
-    switch (type) {
-      case TypeDemande.ABSENCE:
-        return Image.asset('assets/absence.png', width: 30);
-      case TypeDemande.CHANGEMENTFILIERE:
-        return const Icon(Icons.swap_horiz, color: Colors.indigo, size: 30);
-      case TypeDemande.AJOUTMODULE:
-        return const Icon(Icons.add_box, color: Colors.blue, size: 30);
-      default:
-        return const Icon(Icons.help_outline, color: Colors.grey, size: 30);
-    }
-  }
-
-  String _titleForType(TypeDemande? type) {
-    switch (type) {
-      case TypeDemande.ABSENCE:
-        return "Justification d'absence";
-      case TypeDemande.CHANGEMENTFILIERE:
-        return "Changement de filière";
-      case TypeDemande.AJOUTMODULE:
-        return "Ajout de module";
-      default:
-        return "Demande inconnue";
-    }
-  } 
-      */
-
 }

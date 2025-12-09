@@ -13,14 +13,15 @@ Future<Etudiant?> fetchEtudiantAvecDemandes(String email) async {
     if (etudiants.isNotEmpty) {
       final etudiant = etudiants.first;
 
-      // Récupérer ses demandes
+      // Récupérer ses demandes 
+      // /*
       final demandes = await Amplify.DataStore.query(
-        Demande.classType,
-        where: Demande.ETUDIANT.eq(etudiant.id),
+        Absence.classType,
+        where: Absence.ETUDIANT.eq(etudiant.id),
       );
 
       // Retourner une copie de l'étudiant avec ses demandes
-      return etudiant.copyWith(demande: demandes);
+      return etudiant.copyWith(absences: demandes);
     }
   } catch (e) {
     print("Erreur lors de la récupération : $e");

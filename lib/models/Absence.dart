@@ -23,19 +23,18 @@ import 'ModelProvider.dart';
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 
 
-/** This is an auto generated class representing the Demande type in your schema. */
-class Demande extends amplify_core.Model {
-  static const classType = const _DemandeModelType();
+/** This is an auto generated class representing the Absence type in your schema. */
+class Absence extends amplify_core.Model {
+  static const classType = const _AbsenceModelType();
   final String id;
-  final TypeDemande? _typeDemande;
-  final Status? _status;
-  final String? _commentaire;
   final Etudiant? _etudiant;
-  final amplify_core.TemporalDateTime? _createdAt;
-  final amplify_core.TemporalDateTime? _updatedAt;
+  final Status? _status;
   final amplify_core.TemporalDateTime? _dateAbsence;
   final String? _justificationUrl;
   final String? _module;
+  final String? _commentaire;
+  final amplify_core.TemporalDateTime? _createdAt;
+  final amplify_core.TemporalDateTime? _updatedAt;
 
   @override
   getInstanceType() => classType;
@@ -44,23 +43,14 @@ class Demande extends amplify_core.Model {
   @override
   String getId() => id;
   
-  DemandeModelIdentifier get modelIdentifier {
-      return DemandeModelIdentifier(
+  AbsenceModelIdentifier get modelIdentifier {
+      return AbsenceModelIdentifier(
         id: id
       );
   }
   
-  TypeDemande get typeDemande {
-    try {
-      return _typeDemande!;
-    } catch(e) {
-      throw amplify_core.AmplifyCodeGenModelException(
-          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
-          recoverySuggestion:
-            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
-          underlyingException: e.toString()
-          );
-    }
+  Etudiant? get etudiant {
+    return _etudiant;
   }
   
   Status get status {
@@ -76,22 +66,6 @@ class Demande extends amplify_core.Model {
     }
   }
   
-  String? get commentaire {
-    return _commentaire;
-  }
-  
-  Etudiant? get etudiant {
-    return _etudiant;
-  }
-  
-  amplify_core.TemporalDateTime? get createdAt {
-    return _createdAt;
-  }
-  
-  amplify_core.TemporalDateTime? get updatedAt {
-    return _updatedAt;
-  }
-  
   amplify_core.TemporalDateTime? get dateAbsence {
     return _dateAbsence;
   }
@@ -104,20 +78,31 @@ class Demande extends amplify_core.Model {
     return _module;
   }
   
-  const Demande._internal({required this.id, required typeDemande, required status, commentaire, etudiant, createdAt, updatedAt, dateAbsence, justificationUrl, module}): _typeDemande = typeDemande, _status = status, _commentaire = commentaire, _etudiant = etudiant, _createdAt = createdAt, _updatedAt = updatedAt, _dateAbsence = dateAbsence, _justificationUrl = justificationUrl, _module = module;
+  String? get commentaire {
+    return _commentaire;
+  }
   
-  factory Demande({String? id, required TypeDemande typeDemande, required Status status, String? commentaire, Etudiant? etudiant, amplify_core.TemporalDateTime? createdAt, amplify_core.TemporalDateTime? updatedAt, amplify_core.TemporalDateTime? dateAbsence, String? justificationUrl, String? module}) {
-    return Demande._internal(
+  amplify_core.TemporalDateTime? get createdAt {
+    return _createdAt;
+  }
+  
+  amplify_core.TemporalDateTime? get updatedAt {
+    return _updatedAt;
+  }
+  
+  const Absence._internal({required this.id, etudiant, required status, dateAbsence, justificationUrl, module, commentaire, createdAt, updatedAt}): _etudiant = etudiant, _status = status, _dateAbsence = dateAbsence, _justificationUrl = justificationUrl, _module = module, _commentaire = commentaire, _createdAt = createdAt, _updatedAt = updatedAt;
+  
+  factory Absence({String? id, Etudiant? etudiant, required Status status, amplify_core.TemporalDateTime? dateAbsence, String? justificationUrl, String? module, String? commentaire, amplify_core.TemporalDateTime? createdAt, amplify_core.TemporalDateTime? updatedAt}) {
+    return Absence._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
-      typeDemande: typeDemande,
-      status: status,
-      commentaire: commentaire,
       etudiant: etudiant,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
+      status: status,
       dateAbsence: dateAbsence,
       justificationUrl: justificationUrl,
-      module: module);
+      module: module,
+      commentaire: commentaire,
+      createdAt: createdAt,
+      updatedAt: updatedAt);
   }
   
   bool equals(Object other) {
@@ -127,17 +112,16 @@ class Demande extends amplify_core.Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Demande &&
+    return other is Absence &&
       id == other.id &&
-      _typeDemande == other._typeDemande &&
-      _status == other._status &&
-      _commentaire == other._commentaire &&
       _etudiant == other._etudiant &&
-      _createdAt == other._createdAt &&
-      _updatedAt == other._updatedAt &&
+      _status == other._status &&
       _dateAbsence == other._dateAbsence &&
       _justificationUrl == other._justificationUrl &&
-      _module == other._module;
+      _module == other._module &&
+      _commentaire == other._commentaire &&
+      _createdAt == other._createdAt &&
+      _updatedAt == other._updatedAt;
   }
   
   @override
@@ -147,110 +131,103 @@ class Demande extends amplify_core.Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Demande {");
+    buffer.write("Absence {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("typeDemande=" + (_typeDemande != null ? amplify_core.enumToString(_typeDemande)! : "null") + ", ");
-    buffer.write("status=" + (_status != null ? amplify_core.enumToString(_status)! : "null") + ", ");
-    buffer.write("commentaire=" + "$_commentaire" + ", ");
     buffer.write("etudiant=" + (_etudiant != null ? _etudiant!.toString() : "null") + ", ");
-    buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
-    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null") + ", ");
+    buffer.write("status=" + (_status != null ? amplify_core.enumToString(_status)! : "null") + ", ");
     buffer.write("dateAbsence=" + (_dateAbsence != null ? _dateAbsence!.format() : "null") + ", ");
     buffer.write("justificationUrl=" + "$_justificationUrl" + ", ");
-    buffer.write("module=" + "$_module");
+    buffer.write("module=" + "$_module" + ", ");
+    buffer.write("commentaire=" + "$_commentaire" + ", ");
+    buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
+    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
     
     return buffer.toString();
   }
   
-  Demande copyWith({TypeDemande? typeDemande, Status? status, String? commentaire, Etudiant? etudiant, amplify_core.TemporalDateTime? createdAt, amplify_core.TemporalDateTime? updatedAt, amplify_core.TemporalDateTime? dateAbsence, String? justificationUrl, String? module}) {
-    return Demande._internal(
+  Absence copyWith({Etudiant? etudiant, Status? status, amplify_core.TemporalDateTime? dateAbsence, String? justificationUrl, String? module, String? commentaire, amplify_core.TemporalDateTime? createdAt, amplify_core.TemporalDateTime? updatedAt}) {
+    return Absence._internal(
       id: id,
-      typeDemande: typeDemande ?? this.typeDemande,
-      status: status ?? this.status,
-      commentaire: commentaire ?? this.commentaire,
       etudiant: etudiant ?? this.etudiant,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
+      status: status ?? this.status,
       dateAbsence: dateAbsence ?? this.dateAbsence,
       justificationUrl: justificationUrl ?? this.justificationUrl,
-      module: module ?? this.module);
+      module: module ?? this.module,
+      commentaire: commentaire ?? this.commentaire,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt);
   }
   
-  Demande copyWithModelFieldValues({
-    ModelFieldValue<TypeDemande>? typeDemande,
-    ModelFieldValue<Status>? status,
-    ModelFieldValue<String?>? commentaire,
+  Absence copyWithModelFieldValues({
     ModelFieldValue<Etudiant?>? etudiant,
-    ModelFieldValue<amplify_core.TemporalDateTime?>? createdAt,
-    ModelFieldValue<amplify_core.TemporalDateTime?>? updatedAt,
+    ModelFieldValue<Status>? status,
     ModelFieldValue<amplify_core.TemporalDateTime?>? dateAbsence,
     ModelFieldValue<String?>? justificationUrl,
-    ModelFieldValue<String?>? module
+    ModelFieldValue<String?>? module,
+    ModelFieldValue<String?>? commentaire,
+    ModelFieldValue<amplify_core.TemporalDateTime?>? createdAt,
+    ModelFieldValue<amplify_core.TemporalDateTime?>? updatedAt
   }) {
-    return Demande._internal(
+    return Absence._internal(
       id: id,
-      typeDemande: typeDemande == null ? this.typeDemande : typeDemande.value,
-      status: status == null ? this.status : status.value,
-      commentaire: commentaire == null ? this.commentaire : commentaire.value,
       etudiant: etudiant == null ? this.etudiant : etudiant.value,
-      createdAt: createdAt == null ? this.createdAt : createdAt.value,
-      updatedAt: updatedAt == null ? this.updatedAt : updatedAt.value,
+      status: status == null ? this.status : status.value,
       dateAbsence: dateAbsence == null ? this.dateAbsence : dateAbsence.value,
       justificationUrl: justificationUrl == null ? this.justificationUrl : justificationUrl.value,
-      module: module == null ? this.module : module.value
+      module: module == null ? this.module : module.value,
+      commentaire: commentaire == null ? this.commentaire : commentaire.value,
+      createdAt: createdAt == null ? this.createdAt : createdAt.value,
+      updatedAt: updatedAt == null ? this.updatedAt : updatedAt.value
     );
   }
   
-  Demande.fromJson(Map<String, dynamic> json)  
+  Absence.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
-      _typeDemande = amplify_core.enumFromString<TypeDemande>(json['typeDemande'], TypeDemande.values),
-      _status = amplify_core.enumFromString<Status>(json['status'], Status.values),
-      _commentaire = json['commentaire'],
       _etudiant = json['etudiant'] != null
         ? json['etudiant']['serializedData'] != null
           ? Etudiant.fromJson(new Map<String, dynamic>.from(json['etudiant']['serializedData']))
           : Etudiant.fromJson(new Map<String, dynamic>.from(json['etudiant']))
         : null,
-      _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
-      _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null,
+      _status = amplify_core.enumFromString<Status>(json['status'], Status.values),
       _dateAbsence = json['dateAbsence'] != null ? amplify_core.TemporalDateTime.fromString(json['dateAbsence']) : null,
       _justificationUrl = json['justificationUrl'],
-      _module = json['module'];
+      _module = json['module'],
+      _commentaire = json['commentaire'],
+      _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
+      _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'typeDemande': amplify_core.enumToString(_typeDemande), 'status': amplify_core.enumToString(_status), 'commentaire': _commentaire, 'etudiant': _etudiant?.toJson(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format(), 'dateAbsence': _dateAbsence?.format(), 'justificationUrl': _justificationUrl, 'module': _module
+    'id': id, 'etudiant': _etudiant?.toJson(), 'status': amplify_core.enumToString(_status), 'dateAbsence': _dateAbsence?.format(), 'justificationUrl': _justificationUrl, 'module': _module, 'commentaire': _commentaire, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
     'id': id,
-    'typeDemande': _typeDemande,
-    'status': _status,
-    'commentaire': _commentaire,
     'etudiant': _etudiant,
-    'createdAt': _createdAt,
-    'updatedAt': _updatedAt,
+    'status': _status,
     'dateAbsence': _dateAbsence,
     'justificationUrl': _justificationUrl,
-    'module': _module
+    'module': _module,
+    'commentaire': _commentaire,
+    'createdAt': _createdAt,
+    'updatedAt': _updatedAt
   };
 
-  static final amplify_core.QueryModelIdentifier<DemandeModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<DemandeModelIdentifier>();
+  static final amplify_core.QueryModelIdentifier<AbsenceModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<AbsenceModelIdentifier>();
   static final ID = amplify_core.QueryField(fieldName: "id");
-  static final TYPEDEMANDE = amplify_core.QueryField(fieldName: "typeDemande");
-  static final STATUS = amplify_core.QueryField(fieldName: "status");
-  static final COMMENTAIRE = amplify_core.QueryField(fieldName: "commentaire");
   static final ETUDIANT = amplify_core.QueryField(
     fieldName: "etudiant",
     fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'Etudiant'));
-  static final CREATEDAT = amplify_core.QueryField(fieldName: "createdAt");
-  static final UPDATEDAT = amplify_core.QueryField(fieldName: "updatedAt");
+  static final STATUS = amplify_core.QueryField(fieldName: "status");
   static final DATEABSENCE = amplify_core.QueryField(fieldName: "dateAbsence");
   static final JUSTIFICATIONURL = amplify_core.QueryField(fieldName: "justificationUrl");
   static final MODULE = amplify_core.QueryField(fieldName: "module");
+  static final COMMENTAIRE = amplify_core.QueryField(fieldName: "commentaire");
+  static final CREATEDAT = amplify_core.QueryField(fieldName: "createdAt");
+  static final UPDATEDAT = amplify_core.QueryField(fieldName: "updatedAt");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Demande";
-    modelSchemaDefinition.pluralName = "Demandes";
+    modelSchemaDefinition.name = "Absence";
+    modelSchemaDefinition.pluralName = "Absences";
     
     modelSchemaDefinition.authRules = [
       amplify_core.AuthRule(
@@ -275,88 +252,86 @@ class Demande extends amplify_core.Model {
         ])
     ];
     
+    modelSchemaDefinition.indexes = [
+      amplify_core.ModelIndex(fields: const ["etudiantId"], name: "byEtudiantAbsence")
+    ];
+    
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.id());
     
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Demande.TYPEDEMANDE,
-      isRequired: true,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.enumeration)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Demande.STATUS,
-      isRequired: true,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.enumeration)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Demande.COMMENTAIRE,
-      isRequired: false,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
-    ));
-    
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.belongsTo(
-      key: Demande.ETUDIANT,
+      key: Absence.ETUDIANT,
       isRequired: false,
       targetNames: ['etudiantId'],
       ofModelName: 'Etudiant'
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Demande.CREATEDAT,
+      key: Absence.STATUS,
+      isRequired: true,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.enumeration)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Absence.DATEABSENCE,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Demande.UPDATEDAT,
-      isRequired: false,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Demande.DATEABSENCE,
-      isRequired: false,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Demande.JUSTIFICATIONURL,
+      key: Absence.JUSTIFICATIONURL,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Demande.MODULE,
+      key: Absence.MODULE,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Absence.COMMENTAIRE,
+      isRequired: false,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Absence.CREATEDAT,
+      isRequired: false,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Absence.UPDATEDAT,
+      isRequired: false,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)
     ));
   });
 }
 
-class _DemandeModelType extends amplify_core.ModelType<Demande> {
-  const _DemandeModelType();
+class _AbsenceModelType extends amplify_core.ModelType<Absence> {
+  const _AbsenceModelType();
   
   @override
-  Demande fromJson(Map<String, dynamic> jsonData) {
-    return Demande.fromJson(jsonData);
+  Absence fromJson(Map<String, dynamic> jsonData) {
+    return Absence.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'Demande';
+    return 'Absence';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [Demande] in your schema.
+ * of [Absence] in your schema.
  */
-class DemandeModelIdentifier implements amplify_core.ModelIdentifier<Demande> {
+class AbsenceModelIdentifier implements amplify_core.ModelIdentifier<Absence> {
   final String id;
 
-  /** Create an instance of DemandeModelIdentifier using [id] the primary key. */
-  const DemandeModelIdentifier({
+  /** Create an instance of AbsenceModelIdentifier using [id] the primary key. */
+  const AbsenceModelIdentifier({
     required this.id});
   
   @override
@@ -374,7 +349,7 @@ class DemandeModelIdentifier implements amplify_core.ModelIdentifier<Demande> {
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'DemandeModelIdentifier(id: $id)';
+  String toString() => 'AbsenceModelIdentifier(id: $id)';
   
   @override
   bool operator ==(Object other) {
@@ -382,7 +357,7 @@ class DemandeModelIdentifier implements amplify_core.ModelIdentifier<Demande> {
       return true;
     }
     
-    return other is DemandeModelIdentifier &&
+    return other is AbsenceModelIdentifier &&
       id == other.id;
   }
   

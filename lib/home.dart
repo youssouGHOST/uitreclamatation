@@ -2,11 +2,12 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:reclamation_uit/demande.dart';
-import 'package:reclamation_uit/demandepage.dart';
+import 'package:reclamation_uit/DashbordPage.dart';
 import 'signin.dart';
 import './widget/CustomBottomNav.dart';
 import 'profil.dart';
 import 'package:provider/provider.dart';
+
 import 'provider/EtudiantProvider.dart'; // chemin vers ton provider
 
 class HomePage extends StatefulWidget {
@@ -66,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                     onPressed: () {
                       // Exemple : aller vers FaireDemande
-                       Navigator.push(context, MaterialPageRoute(builder: (_) =>  DemandePage( etudiant:etudiant!)));
+                       Navigator.push(context, MaterialPageRoute(builder: (_) => DashboardPage( etudiant:etudiant!)));
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),

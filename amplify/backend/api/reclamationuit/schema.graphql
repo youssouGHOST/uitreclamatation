@@ -1,71 +1,78 @@
-type Etudiant @model @auth(rules: [  { allow: owner, ownerField: "owner", operations: [create, read, update]
- } , { allow: public, operations: [create] }
+type Etudiant @model @auth(rules: [
+  { allow: owner, ownerField: "owner", operations: [create, read, update] },
+  { allow: public, operations: [create] }
 ]) {
   id: ID!
   nom: String!
   prenom: String!
-  apogee: String! @index(name: "byApogee" ,queryField: "etudiantbyApogee")
+  apogee: String! @index(name: "byApogee", queryField: "etudiantByApogee")
   cin: String!
   cycle: Cycle! @index(name: "byCycle", queryField: "etudiantByCycle")
   email: AWSEmail! @index(name: "byEmail", queryField: "etudiantByEmail")
   owner: String
   filiereId: ID! @index(name: "byFiliereEtudiant", queryField: "etudiantByFiliere")
   filiere: Filiere @belongsTo(fields: ["filiereId"])
-  demande: [Demande] @hasMany(fields: ["id"])
 
+  # 🔥 Les demandes ont disparu
+  # On garde :
+  absences: [Absence] @hasMany(indexName: "byEtudiantAbsence", fields: ["id"])
+  attestationsInscription: [AttestationInscription] @hasMany(indexName: "byEtudiant", fields: ["id"])
 }
 
-                                 
-type Filiere @model  @auth(rules: [
+type Absence @model @auth(rules: [
+  { allow: owner, ownerField: "owner", operations: [create, read, update, delete] },
+  { allow: groups, groups: ["Operateurs"], operations: [read, update] }
+]) {
+  id: ID!
 
-  
+  etudiantId: ID! @index(name: "byEtudiantAbsence")
+  etudiant: Etudiant @belongsTo(fields: ["etudiantId"])
+
+  status: Status!
+  dateAbsence: AWSDateTime
+  justificationUrl: AWSURL
+  module: String
+  commentaire: String
+
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type AttestationInscription @model @auth(rules: [
+  { allow: owner, ownerField: "owner", operations: [create, read, update, delete] },
+  { allow: groups, groups: ["Operateurs"], operations: [read, update] }
+]) {
+  id: ID!
+
+  etudiantId: ID! @index(name: "byEtudiant")
+  etudiant: Etudiant @belongsTo(fields: ["etudiantId"])
+
+  status: Status!
+}
+
+type Filiere @model @auth(rules: [
   { allow: public, operations: [create, read, update, delete] },
   { allow: private, operations: [read] },
   { allow: owner, operations: [create, read, update] }
-
-  ]) {
-  id:ID!
-  nomFiliere: NomFiliere! @index(name: "byNomFiliere",queryField: "nomFiliere")
+]) {
+  id: ID!
+  nomFiliere: NomFiliere! @index(name: "byNomFiliere", queryField: "nomFiliere")
   operateur: Operateur @hasOne(fields: ["id"])
-  etudiants: [Etudiant] @hasMany( fields: ["id"])
+  etudiants: [Etudiant] @hasMany(fields: ["id"])
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
-
-
 }
-type Operateur @model
-  @auth(rules: [
-    { allow: groups, groups: ["Operateurs"], operations: [read, create, update] }
-  ]) {
+
+type Operateur @model @auth(rules: [
+  { allow: groups, groups: ["Operateurs"], operations: [read, create, update] }
+]) {
   id: ID!
   nom: String!
   prenom: String!
-  email: AWSEmail! @index(name: "byEmail", queryField: "operateurbyEmail")
+  email: AWSEmail! @index(name: "byEmail", queryField: "operateurByEmail")
   filiereId: ID! @index(name: "byFiliereOperateur")
   filiere: Filiere @belongsTo(fields: ["filiereId"])
 }
-
-type Demande @model @auth(rules: [
-  { allow: owner, ownerField: "owner", operations: [create, read, update,delete] },
-  { allow: groups, groups: ["Operateurs"], operations: [read, update] }
-]) {
-  id:ID!
-  typeDemande: TypeDemande!
-  status: Status!
-  commentaire: String
-  etudiantId: ID!
-  etudiant: Etudiant @belongsTo(fields:["etudiantId"]) 
-  createdAt: AWSDateTime
-  updatedAt: AWSDateTime
-  dateAbsence:AWSDateTime
-  justificationUrl: AWSURL # 👈 Nouveau champ pour le lien du fichier S3
-
-  module:String 
-
-
-}
-
-
 
 enum NomFiliere {
   BIOLOGIE
@@ -80,15 +87,8 @@ enum Cycle {
   MASTER
 }
 
-enum TypeDemande {
-  ABSENCE
-  INSCRIPTIONPEDAGOGIQUE
-  CHANGEMENTFILIERE
-  AJOUTMODULE
-}
-
-enum Status{
+enum Status {
   REFUS
   ENCOURS
   ACCEPTE
-}                        
+}

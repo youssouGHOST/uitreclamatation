@@ -36,7 +36,8 @@ class Etudiant extends amplify_core.Model {
   final String? _email;
   final String? _owner;
   final Filiere? _filiere;
-  final List<Demande>? _demande;
+  final List<Absence>? _absences;
+  final List<AttestationInscription>? _attestationsInscription;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -139,8 +140,12 @@ class Etudiant extends amplify_core.Model {
     return _filiere;
   }
   
-  List<Demande>? get demande {
-    return _demande;
+  List<Absence>? get absences {
+    return _absences;
+  }
+  
+  List<AttestationInscription>? get attestationsInscription {
+    return _attestationsInscription;
   }
   
   amplify_core.TemporalDateTime? get createdAt {
@@ -151,9 +156,9 @@ class Etudiant extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Etudiant._internal({required this.id, required nom, required prenom, required apogee, required cin, required cycle, required email, owner, filiere, demande, createdAt, updatedAt}): _nom = nom, _prenom = prenom, _apogee = apogee, _cin = cin, _cycle = cycle, _email = email, _owner = owner, _filiere = filiere, _demande = demande, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Etudiant._internal({required this.id, required nom, required prenom, required apogee, required cin, required cycle, required email, owner, filiere, absences, attestationsInscription, createdAt, updatedAt}): _nom = nom, _prenom = prenom, _apogee = apogee, _cin = cin, _cycle = cycle, _email = email, _owner = owner, _filiere = filiere, _absences = absences, _attestationsInscription = attestationsInscription, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Etudiant({String? id, required String nom, required String prenom, required String apogee, required String cin, required Cycle cycle, required String email, String? owner, Filiere? filiere, List<Demande>? demande}) {
+  factory Etudiant({String? id, required String nom, required String prenom, required String apogee, required String cin, required Cycle cycle, required String email, String? owner, Filiere? filiere, List<Absence>? absences, List<AttestationInscription>? attestationsInscription}) {
     return Etudiant._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       nom: nom,
@@ -164,7 +169,8 @@ class Etudiant extends amplify_core.Model {
       email: email,
       owner: owner,
       filiere: filiere,
-      demande: demande != null ? List<Demande>.unmodifiable(demande) : demande);
+      absences: absences != null ? List<Absence>.unmodifiable(absences) : absences,
+      attestationsInscription: attestationsInscription != null ? List<AttestationInscription>.unmodifiable(attestationsInscription) : attestationsInscription);
   }
   
   bool equals(Object other) {
@@ -184,7 +190,8 @@ class Etudiant extends amplify_core.Model {
       _email == other._email &&
       _owner == other._owner &&
       _filiere == other._filiere &&
-      DeepCollectionEquality().equals(_demande, other._demande);
+      DeepCollectionEquality().equals(_absences, other._absences) &&
+      DeepCollectionEquality().equals(_attestationsInscription, other._attestationsInscription);
   }
   
   @override
@@ -211,7 +218,7 @@ class Etudiant extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Etudiant copyWith({String? nom, String? prenom, String? apogee, String? cin, Cycle? cycle, String? email, String? owner, Filiere? filiere, List<Demande>? demande}) {
+  Etudiant copyWith({String? nom, String? prenom, String? apogee, String? cin, Cycle? cycle, String? email, String? owner, Filiere? filiere, List<Absence>? absences, List<AttestationInscription>? attestationsInscription}) {
     return Etudiant._internal(
       id: id,
       nom: nom ?? this.nom,
@@ -222,7 +229,8 @@ class Etudiant extends amplify_core.Model {
       email: email ?? this.email,
       owner: owner ?? this.owner,
       filiere: filiere ?? this.filiere,
-      demande: demande ?? this.demande);
+      absences: absences ?? this.absences,
+      attestationsInscription: attestationsInscription ?? this.attestationsInscription);
   }
   
   Etudiant copyWithModelFieldValues({
@@ -234,7 +242,8 @@ class Etudiant extends amplify_core.Model {
     ModelFieldValue<String>? email,
     ModelFieldValue<String?>? owner,
     ModelFieldValue<Filiere?>? filiere,
-    ModelFieldValue<List<Demande>?>? demande
+    ModelFieldValue<List<Absence>?>? absences,
+    ModelFieldValue<List<AttestationInscription>?>? attestationsInscription
   }) {
     return Etudiant._internal(
       id: id,
@@ -246,7 +255,8 @@ class Etudiant extends amplify_core.Model {
       email: email == null ? this.email : email.value,
       owner: owner == null ? this.owner : owner.value,
       filiere: filiere == null ? this.filiere : filiere.value,
-      demande: demande == null ? this.demande : demande.value
+      absences: absences == null ? this.absences : absences.value,
+      attestationsInscription: attestationsInscription == null ? this.attestationsInscription : attestationsInscription.value
     );
   }
   
@@ -264,24 +274,37 @@ class Etudiant extends amplify_core.Model {
           ? Filiere.fromJson(new Map<String, dynamic>.from(json['filiere']['serializedData']))
           : Filiere.fromJson(new Map<String, dynamic>.from(json['filiere']))
         : null,
-      _demande = json['demande']  is Map
-        ? (json['demande']['items'] is List
-          ? (json['demande']['items'] as List)
+      _absences = json['absences']  is Map
+        ? (json['absences']['items'] is List
+          ? (json['absences']['items'] as List)
               .where((e) => e != null)
-              .map((e) => Demande.fromJson(new Map<String, dynamic>.from(e)))
+              .map((e) => Absence.fromJson(new Map<String, dynamic>.from(e)))
               .toList()
           : null)
-        : (json['demande'] is List
-          ? (json['demande'] as List)
+        : (json['absences'] is List
+          ? (json['absences'] as List)
               .where((e) => e?['serializedData'] != null)
-              .map((e) => Demande.fromJson(new Map<String, dynamic>.from(e?['serializedData'])))
+              .map((e) => Absence.fromJson(new Map<String, dynamic>.from(e?['serializedData'])))
+              .toList()
+          : null),
+      _attestationsInscription = json['attestationsInscription']  is Map
+        ? (json['attestationsInscription']['items'] is List
+          ? (json['attestationsInscription']['items'] as List)
+              .where((e) => e != null)
+              .map((e) => AttestationInscription.fromJson(new Map<String, dynamic>.from(e)))
+              .toList()
+          : null)
+        : (json['attestationsInscription'] is List
+          ? (json['attestationsInscription'] as List)
+              .where((e) => e?['serializedData'] != null)
+              .map((e) => AttestationInscription.fromJson(new Map<String, dynamic>.from(e?['serializedData'])))
               .toList()
           : null),
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'nom': _nom, 'prenom': _prenom, 'apogee': _apogee, 'cin': _cin, 'cycle': amplify_core.enumToString(_cycle), 'email': _email, 'owner': _owner, 'filiere': _filiere?.toJson(), 'demande': _demande?.map((Demande? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'nom': _nom, 'prenom': _prenom, 'apogee': _apogee, 'cin': _cin, 'cycle': amplify_core.enumToString(_cycle), 'email': _email, 'owner': _owner, 'filiere': _filiere?.toJson(), 'absences': _absences?.map((Absence? e) => e?.toJson()).toList(), 'attestationsInscription': _attestationsInscription?.map((AttestationInscription? e) => e?.toJson()).toList(), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
@@ -294,7 +317,8 @@ class Etudiant extends amplify_core.Model {
     'email': _email,
     'owner': _owner,
     'filiere': _filiere,
-    'demande': _demande,
+    'absences': _absences,
+    'attestationsInscription': _attestationsInscription,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
@@ -311,9 +335,12 @@ class Etudiant extends amplify_core.Model {
   static final FILIERE = amplify_core.QueryField(
     fieldName: "filiere",
     fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'Filiere'));
-  static final DEMANDE = amplify_core.QueryField(
-    fieldName: "demande",
-    fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'Demande'));
+  static final ABSENCES = amplify_core.QueryField(
+    fieldName: "absences",
+    fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'Absence'));
+  static final ATTESTATIONSINSCRIPTION = amplify_core.QueryField(
+    fieldName: "attestationsInscription",
+    fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'AttestationInscription'));
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "Etudiant";
     modelSchemaDefinition.pluralName = "Etudiants";
@@ -395,10 +422,17 @@ class Etudiant extends amplify_core.Model {
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.hasMany(
-      key: Etudiant.DEMANDE,
+      key: Etudiant.ABSENCES,
       isRequired: false,
-      ofModelName: 'Demande',
-      associatedKey: Demande.ETUDIANT
+      ofModelName: 'Absence',
+      associatedKey: Absence.ETUDIANT
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.hasMany(
+      key: Etudiant.ATTESTATIONSINSCRIPTION,
+      isRequired: false,
+      ofModelName: 'AttestationInscription',
+      associatedKey: AttestationInscription.ETUDIANT
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
