@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:reclamation_uit/FormulaireAbsence.dart';
 import 'package:reclamation_uit/models/ModelProvider.dart';
 import 'package:reclamation_uit/DemandeAttestation.dart';
-
+import 'package:reclamation_uit/DemandeAnnulation.dart';
+import 'package:reclamation_uit/FormulaireAnomalie.dart';
 import 'package:reclamation_uit/widget/CustomBottomNav.dart';
 class Demande extends StatefulWidget {
   const Demande({super.key});
@@ -41,7 +42,7 @@ class _DemandeState extends State<Demande> {
               context,
               "Justification d'absence",
               'assets/absence.png',
-              Colors.deepPurple,
+               Colors.indigo,
             const  FormulaireAbsence(),    
                ),
             const SizedBox(height: 16),
@@ -51,6 +52,24 @@ class _DemandeState extends State<Demande> {
               'assets/change.png',
               Colors.indigo,
               const DemandeAttestation(),
+            ),
+               const SizedBox(height: 16),
+
+               _buildDemandButton(
+              context,
+              "Annulation d'inscription",
+              'assets/image.png',
+               Colors.indigo,
+              const DemandeAnnulation(),
+            ),
+               const SizedBox(height: 16),
+
+              _buildDemandButton(
+              context,
+              "signalez une anomalie",
+              'assets/image.png',
+               Colors.indigo,
+              const FormulaireAnomalie(),
             ),
            
           ],

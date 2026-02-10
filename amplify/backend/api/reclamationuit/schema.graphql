@@ -1,6 +1,8 @@
 type Etudiant @model @auth(rules: [
   { allow: owner, ownerField: "owner", operations: [create, read, update] },
   { allow: public, operations: [create] }
+   { allow: groups, groups: ["Operateurs"], operations: [read] }
+
 ]) {
   id: ID!
   nom: String!
@@ -12,11 +14,11 @@ type Etudiant @model @auth(rules: [
   owner: String
   filiereId: ID! @index(name: "byFiliereEtudiant", queryField: "etudiantByFiliere")
   filiere: Filiere @belongsTo(fields: ["filiereId"])
-
-  # 🔥 Les demandes ont disparu
-  # On garde :
   absences: [Absence] @hasMany(indexName: "byEtudiantAbsence", fields: ["id"])
   attestationsInscription: [AttestationInscription] @hasMany(indexName: "byEtudiant", fields: ["id"])
+  annulationInscription: [AnnulationInscription] @hasMany(indexName: "byEtudiant", fields: ["id"])
+  anomalies: [Anomalies] @hasMany(indexName: "byEtudiant", fields: ["id"])
+
 }
 
 type Absence @model @auth(rules: [
@@ -46,9 +48,47 @@ type AttestationInscription @model @auth(rules: [
 
   etudiantId: ID! @index(name: "byEtudiant")
   etudiant: Etudiant @belongsTo(fields: ["etudiantId"])
-
   status: Status!
 }
+
+type AnnulationInscription @model @auth(rules: [
+  { allow: owner, ownerField: "owner", operations: [create, read, update, delete] },
+  { allow: groups, groups: ["Operateurs"], operations: [read, update] }
+]) {
+  id: ID!
+  etudiantId: ID! @index(name: "byEtudiant")
+  etudiant: Etudiant @belongsTo(fields: ["etudiantId"])
+  status: Status!
+}
+
+type Anomalies @model @auth(rules: [
+  { allow: owner, ownerField: "owner", operations: [create, read, update, delete] },
+  { allow: groups, groups: ["Operateurs"], operations: [read, update] }
+]) {
+  id: ID!
+  etudiantId: ID! @index(name: "byEtudiant")
+  etudiant: Etudiant @belongsTo(fields: ["etudiantId"])
+  anomalie: Anomalie!
+  description: String 
+  status: Status!
+
+}
+
+
+
+type AjoutModule @model @auth(rules: [
+  { allow: owner, ownerField: "owner", operations: [create, read, update, delete] },
+  { allow: groups, groups: ["Operateurs"], operations: [read, update] }
+]) {
+  id: ID!
+  etudiantId: ID! @index(name: "byEtudiant")
+  etudiant: Etudiant @belongsTo(fields: ["etudiantId"])
+  module: String!
+  semestre: String!
+  status: Status!
+}
+
+
 
 type Filiere @model @auth(rules: [
   { allow: public, operations: [create, read, update, delete] },
@@ -74,6 +114,7 @@ type Operateur @model @auth(rules: [
   filiere: Filiere @belongsTo(fields: ["filiereId"])
 }
 
+
 enum NomFiliere {
   BIOLOGIE
   PHYSIQUE
@@ -92,3 +133,10 @@ enum Status {
   ENCOURS
   ACCEPTE
 }
+
+enum Anomalie {
+INSCRIPTION
+AFFICHAGE_ENT
+CALENDRIER_EXAMEN
+}
+

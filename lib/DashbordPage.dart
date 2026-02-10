@@ -3,6 +3,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:reclamation_uit/models/ModelProvider.dart';
 import 'package:reclamation_uit/DemandePage.dart';
+import 'package:reclamation_uit/pageAnomalie.dart';
 import 'package:reclamation_uit/pageAttestation.dart'; // Page Absence
 
 class DashboardPage extends StatefulWidget {
@@ -125,7 +126,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     title: "Absences",
                     subtitle: "Total : $totalAbsences",
                     icon: Icons.note_alt_outlined,
-                    color: Colors.orange,
+                    color: const Color.fromARGB(255, 14, 49, 190),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -153,6 +154,26 @@ class _DashboardPageState extends State<DashboardPage> {
                         MaterialPageRoute(
                           builder: (_) => PageAttestation(
                             etudiant: widget.etudiant,
+                          ),
+                        ),
+                      );
+                      // Tu peux ajouter une redirection plus tard
+                    },
+                  ),
+                     const SizedBox(height: 20),
+
+                       _buildCard(
+                    title: "Anomalies",
+                    subtitle: attestationDisponible
+                        ? "Traitées • Total : $totalAttestations"
+                        : "Aucune anomalie",
+                    icon: Icons.report_problem_outlined ,
+                    color: const Color.fromARGB(255, 234, 163, 58),
+                    onTap: () {
+                       Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PageAnomalie(etudiant: widget.etudiant,
                           ),
                         ),
                       );

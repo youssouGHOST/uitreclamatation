@@ -6,14 +6,14 @@ import 'package:reclamation_uit/models/ModelProvider.dart';
 import 'package:reclamation_uit/widget/CustomBottomNav.dart';
 import 'provider/EtudiantProvider.dart';
 
-class DemandeAttestation extends StatefulWidget {
-  const DemandeAttestation({super.key});
+class DemandeAnnulation extends StatefulWidget {
+  const DemandeAnnulation({super.key});
 
   @override
-  State<DemandeAttestation> createState() => _DemandeAttestationState();
+  State<DemandeAnnulation> createState() => _DemandeAnnulationState();
 }
 
-class _DemandeAttestationState extends State<DemandeAttestation> {
+class _DemandeAnnulationState extends State<DemandeAnnulation> {
   bool _loading = false;
   bool hasPendingAttestation = false;
   bool _loadingCheck = true;
@@ -23,15 +23,15 @@ void initState() {
   super.initState();
   _checkPendingAttestation();
 }
-//ETAT ATTESTATION
+//ETAT INSCRIPTION
 Future<void> _checkPendingAttestation() async {
   try {
     final etudiant = Provider.of<EtudiantProvider>(context, listen: false).etudiant;
 
     final request = ModelQueries.list(
-      AttestationInscription.classType,
-      where: AttestationInscription.ETUDIANT.eq(etudiant!.id)
-          .and(AttestationInscription.STATUS.eq(Status.ENCOURS)),
+      AnnulationInscription.classType,
+      where: AnnulationInscription.ETUDIANT.eq(etudiant!.id)
+          .and(AnnulationInscription.STATUS.eq(Status.ENCOURS)),
     );
 
     final response = await Amplify.API.query(request: request).response;
@@ -60,18 +60,18 @@ Future<void> _checkPendingAttestation() async {
       // CRÉATION ATTÉSTATION
       // -------------------------------
 
-      final attestation = AttestationInscription(
+      final annulation = AnnulationInscription(
         etudiant: etudiant,
-        status: Status.ENCOURS,  //  champ requis
+        status: Status.ENCOURS,  // 🔥 champ requis
 
       );
 
-      final request = ModelMutations.create(attestation);
+      final request = ModelMutations.create(annulation);
       final response = await Amplify.API.mutate(request: request).response;
 
       if (response.data != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("✔ Attestation demandée avec succès")),
+          const SnackBar(content: Text("✔ Annulation d'inscription demandée avec succès")),
         );
         Navigator.pop(context);
       }
@@ -90,7 +90,7 @@ Future<void> _checkPendingAttestation() async {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text("Demande d’attestation"),
+        title: const Text("Demande d’annulation d'inscription"),
         centerTitle: true,
         elevation: 3,
         backgroundColor: const Color(0xFF2F8DFF),
@@ -113,7 +113,6 @@ Future<void> _checkPendingAttestation() async {
   }
 
   // -------------------------------
-  // HEADER
   // -------------------------------
   Widget _header() {
     return Container(
@@ -131,7 +130,7 @@ Future<void> _checkPendingAttestation() async {
           SizedBox(width: 15),
           Expanded(
             child: Text(
-              "Demande d’attestation d’inscription",
+              "Demande d’annulation d’inscription",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
           ),
@@ -143,8 +142,6 @@ Future<void> _checkPendingAttestation() async {
   // -------------------------------
   // MODULE
   // -------------------------------
-
-
   // -------------------------------
   // BOUTON D’ENVOI
   // -------------------------------
@@ -178,11 +175,11 @@ Future<void> _checkPendingAttestation() async {
 
       if (hasPendingAttestation)
         const Text(
-          " Vous avez déjà une attestation en cours.",
+          " Vous avez déjà une annulation en cours.",
           style: TextStyle(color: Colors.red, fontSize: 15),
         ),
     ],
   );
 }
-
+  
 }

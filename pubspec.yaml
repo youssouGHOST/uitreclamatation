@@ -86,6 +86,8 @@ flutter:
     - assets/module.png
     - assets/anom.png
     - assets/code.jpg
+    - assets/image.png
+
 
 
   # To add assets to your application, add an assets section, like this:

@@ -132,8 +132,8 @@ class _SignInPageState extends State<SignInPage> {
         child: Stack(
           children: [
             Align(alignment: Alignment.bottomLeft, child: Image.asset("assets/bottom1.png")),
-            Align(alignment: Alignment.topCenter, child: Padding(padding: const EdgeInsets.all(10), child: Image.asset('assets/ibn.png', width: 200))),
-            Align(alignment: Alignment.topRight, child: Image.asset('assets/login_img.png', width: 100)),
+            Align(alignment: Alignment.topCenter, child: Padding(padding: const EdgeInsets.all(10), child: Image.asset('assets/ibn.png', width: 100))),
+            Align(alignment: Alignment.topRight, child: Image.asset('assets/login_img.png', width: 150)),
             Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24.0),
