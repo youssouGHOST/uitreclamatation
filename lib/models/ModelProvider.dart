@@ -21,6 +21,7 @@
 
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 import 'Absence.dart';
+import 'AjoutModule.dart';
 import 'AnnulationInscription.dart';
 import 'Anomalies.dart';
 import 'AttestationInscription.dart';
@@ -29,6 +30,7 @@ import 'Filiere.dart';
 import 'Operateur.dart';
 
 export 'Absence.dart';
+export 'AjoutModule.dart';
 export 'AnnulationInscription.dart';
 export 'Anomalie.dart';
 export 'Anomalies.dart';
@@ -42,9 +44,9 @@ export 'Status.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "116a3041cc1add01c0485d2ce17746af";
+  String version = "4c581919c9bac3831bce9216f3afc7ba";
   @override
-  List<amplify_core.ModelSchema> modelSchemas = [Absence.schema, AnnulationInscription.schema, Anomalies.schema, AttestationInscription.schema, Etudiant.schema, Filiere.schema, Operateur.schema];
+  List<amplify_core.ModelSchema> modelSchemas = [Absence.schema, AjoutModule.schema, AnnulationInscription.schema, Anomalies.schema, AttestationInscription.schema, Etudiant.schema, Filiere.schema, Operateur.schema];
   @override
   List<amplify_core.ModelSchema> customTypeSchemas = [];
   static final ModelProvider _instance = ModelProvider();
@@ -55,6 +57,8 @@ class ModelProvider implements amplify_core.ModelProviderInterface {
     switch(modelName) {
       case "Absence":
         return Absence.classType;
+      case "AjoutModule":
+        return AjoutModule.classType;
       case "AnnulationInscription":
         return AnnulationInscription.classType;
       case "Anomalies":

@@ -4,6 +4,8 @@ import 'package:reclamation_uit/models/ModelProvider.dart';
 import 'package:reclamation_uit/DemandeAttestation.dart';
 import 'package:reclamation_uit/DemandeAnnulation.dart';
 import 'package:reclamation_uit/FormulaireAnomalie.dart';
+import 'package:reclamation_uit/FormulaireAjoutModule.dart';
+
 import 'package:reclamation_uit/widget/CustomBottomNav.dart';
 class Demande extends StatefulWidget {
   const Demande({super.key});
@@ -71,6 +73,16 @@ class _DemandeState extends State<Demande> {
                Colors.indigo,
               const FormulaireAnomalie(),
             ),
+             const SizedBox(height: 16),
+
+              _buildDemandButton(
+              context,
+              "Ajouter module",
+              'assets/image.png',
+               Colors.indigo,
+              const FormulaireAjoutModule(),
+            ),
+           
            
           ],
         ),

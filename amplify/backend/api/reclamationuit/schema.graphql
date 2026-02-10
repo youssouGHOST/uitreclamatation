@@ -17,7 +17,8 @@ type Etudiant @model @auth(rules: [
   absences: [Absence] @hasMany(indexName: "byEtudiantAbsence", fields: ["id"])
   attestationsInscription: [AttestationInscription] @hasMany(indexName: "byEtudiant", fields: ["id"])
   annulationInscription: [AnnulationInscription] @hasMany(indexName: "byEtudiant", fields: ["id"])
-  anomalies: [Anomalies] @hasMany(indexName: "byEtudiant", fields: ["id"])
+ ajoutModule: [AjoutModule] @hasMany(indexName: "byEtudiant", fields: ["id"])
+ anomalies: [Anomalies] @hasMany(indexName: "byEtudiant", fields: ["id"])
 
 }
 
@@ -83,7 +84,7 @@ type AjoutModule @model @auth(rules: [
   id: ID!
   etudiantId: ID! @index(name: "byEtudiant")
   etudiant: Etudiant @belongsTo(fields: ["etudiantId"])
-  module: String!
+  module: Int!
   semestre: String!
   status: Status!
 }
