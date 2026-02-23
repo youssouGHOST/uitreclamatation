@@ -22,15 +22,34 @@ class _FormulaireAbsenceState extends State<FormulaireAbsence> {
   String? _fileName;
   String? _justificationUrl;
 
-  Future<void> _choisirJustificatif() async {
-    final url = await StorageService.uploadJustification();
-    if (url != null) {
+  
+Future<void> _choisirJustificatif() async {
+  final etudiant = Provider.of<EtudiantProvider>(context, listen: false).etudiant;
+  if (etudiant == null) return;
+
+  try {
+    // Appel à StorageService avec hachage automatique
+    final result = await StorageService.uploadJustification(
+      apogee: etudiant.apogee,
+    );
+
+    if (result != null) {
       setState(() {
-        _justificationUrl = url;
-        _fileName = url.split("/").last;
+        _justificationUrl = result;
+
+        // Extraire juste le nom du fichier à partir de l’URL
+        final segments = result.split('/');
+        _fileName = segments.isNotEmpty ? segments.last.split('?').first : 'justificatif';
       });
+      safePrint("📎 Fichier prêt : $_fileName");
     }
+  } catch (e) {
+    safePrint("❌ Erreur lors de la sélection du justificatif : $e");
   }
+}
+
+
+
 
   Future<void> _envoyerAbsence() async {
     setState(() => _loading = true);

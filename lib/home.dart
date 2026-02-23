@@ -12,6 +12,7 @@ import 'provider/EtudiantProvider.dart'; // chemin vers ton provider
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+static const Color primaryBlue = Color(0xFF2563EB);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -28,7 +29,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text("Bienvenue"),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 47, 141, 255),
+        backgroundColor: HomePage.primaryBlue,
         foregroundColor: Colors.white,
         elevation: 6,
       ),
@@ -71,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: const Color.fromARGB(255, 47, 141, 255),
+                      backgroundColor: HomePage.primaryBlue,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)),
@@ -109,7 +110,7 @@ class _HomePageState extends State<HomePage> {
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: const Color.fromARGB(255, 47, 141, 255),
+                      backgroundColor:HomePage.primaryBlue,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
