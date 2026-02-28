@@ -14,8 +14,14 @@ class PageAttestation extends StatefulWidget {
 }
 
 class _PageAttestationState extends State<PageAttestation> {
+
   List<AttestationInscription> demandes = [];
   bool isLoading = true;
+
+  // 🎨 Couleurs modernes (identiques aux autres pages)
+  static const Color primaryBlue = Color(0xFF2563EB);
+  static const Color lightBlueBg = Color(0xFFF0F4F8);
+  static const Color textDark = Color(0xFF1E293B);
 
   @override
   void initState() {
@@ -30,6 +36,7 @@ class _PageAttestationState extends State<PageAttestation> {
         AttestationInscription.classType,
         where: AttestationInscription.ETUDIANT.eq(widget.etudiant.id),
       );
+
       final res = await Amplify.API.query(request: req).response;
 
       if (res.data != null) {
@@ -48,10 +55,10 @@ class _PageAttestationState extends State<PageAttestation> {
   Future<void> _deleteDemande(AttestationInscription demande) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (_) => AlertDialog(
         title: const Text("Supprimer l'attestation ?"),
-        content:
-            const Text("Êtes-vous sûr de vouloir supprimer cette demande ?"),
+        content: const Text(
+            "Êtes-vous sûr de vouloir supprimer cette demande ?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -60,20 +67,19 @@ class _PageAttestationState extends State<PageAttestation> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(context, true),
-            child:
-                const Text("Supprimer", style: TextStyle(color: Colors.white)),
+            child: const Text("Supprimer",
+                style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
 
     if (confirm == true) {
-      try {
-        await Amplify.API
-            .mutate(request: ModelMutations.delete(demande))
-            .response;
-        setState(() => demandes.remove(demande));
-      } catch (_) {}
+      await Amplify.API
+          .mutate(request: ModelMutations.delete(demande))
+          .response;
+
+      setState(() => demandes.remove(demande));
     }
   }
 
@@ -97,78 +103,55 @@ class _PageAttestationState extends State<PageAttestation> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      padding:
+          const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
       decoration: BoxDecoration(
         color: color.withOpacity(.15),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         label,
-        style: TextStyle(color: color, fontWeight: FontWeight.w600),
+        style:
+            TextStyle(color: color, fontWeight: FontWeight.w600),
       ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text("Attestation d'inscription"),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF2F8DFF),
-        foregroundColor: Colors.white,
-        elevation: 3,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _header(),
-            const SizedBox(height: 20),
-            Expanded(child: _buildDemandesList()),
-            const SizedBox(height: 20),
-            _logoutButton(),
-          ],
-        ),
-      ),
-      bottomNavigationBar: CustomBottomNav(),
     );
   }
 
   Widget _header() {
-    int nbAccepte = demandes.where((d) => d.status == Status.ACCEPTE).length;
-    int nbRefus = demandes.where((d) => d.status == Status.REFUS).length;
-    int nbEnCours = demandes.where((d) => d.status == Status.ENCOURS).length;
+    int nbAccepte =
+        demandes.where((d) => d.status == Status.ACCEPTE).length;
+    int nbRefus =
+        demandes.where((d) => d.status == Status.REFUS).length;
+    int nbEnCours =
+        demandes.where((d) => d.status == Status.ENCOURS).length;
 
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: lightBlueBg,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 8,
-            spreadRadius: 2,
-          )
-        ],
       ),
       child: Column(
         children: [
           CircleAvatar(
             radius: 35,
-            backgroundImage: const AssetImage('assets/vdemande.png'),
+            backgroundColor: primaryBlue.withOpacity(0.1),
+            child: Icon(Icons.picture_as_pdf,
+                size: 40, color: primaryBlue),
           ),
           const SizedBox(height: 12),
           Text(
             "Total demandes : ${demandes.length}",
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: textDark),
           ),
           const SizedBox(height: 6),
           Text(
             "Validées : $nbAccepte  •  En cours : $nbEnCours  •  Refusées : $nbRefus",
-            style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+            style: TextStyle(
+                fontSize: 13, color: Colors.grey.shade700),
           ),
         ],
       ),
@@ -176,81 +159,109 @@ class _PageAttestationState extends State<PageAttestation> {
   }
 
   Widget _buildDemandesList() {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     if (demandes.isEmpty) {
-      return const Center(
+      return const Padding(
+        padding: EdgeInsets.all(20),
         child: Text(
           "Aucune demande d'attestation pour le moment.",
-          style: TextStyle(fontSize: 16, color: Colors.black54),
+          style:
+              TextStyle(fontSize: 16, color: Colors.black54),
         ),
       );
     }
 
     return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: demandes.length,
       itemBuilder: (context, index) {
         final demande = demandes[index];
 
         return Card(
           elevation: 2,
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          margin: const EdgeInsets.only(bottom: 12),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16)),
           child: Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.school, color: Colors.blue, size: 30),
-                    const SizedBox(width: 12),
                     _statusChip(demande.status),
+                    Text(
+                      demande.createdAt != null
+                          ? demande.createdAt!
+                              .toString()
+                              .split(' ')[0]
+                          : '',
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey),
+                    ),
                   ],
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
-                // 🔵 BOUTON "GÉNÉRER L'ATTESTATION"
-                if (demande.status == Status.ACCEPTE)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade600,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 18, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                if (demande.status ==
+                    Status.ACCEPTE)
+                  ElevatedButton.icon(
+                    style:
+                        ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Colors.green.shade600,
+                      shape:
+                          RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                                12),
                       ),
-                      icon: const Icon(Icons.picture_as_pdf,
-                          color: Colors.white),
-                      label: const Text("Générer attestation",
-                          style: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        // 👉 ici tu appelles ton service PDF
-                      },
                     ),
+                    icon: const Icon(
+                        Icons.picture_as_pdf,
+                        color: Colors.white),
+                    label: const Text(
+                        "Générer attestation",
+                        style: TextStyle(
+                            color: Colors.white)),
+                    onPressed: () {
+                      // 👉 service PDF ici
+                    },
                   ),
 
                 const SizedBox(height: 10),
 
                 Align(
-                  alignment: Alignment.centerRight,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                  alignment:
+                      Alignment.centerRight,
+                  child:
+                      ElevatedButton.icon(
+                    style:
+                        ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Colors.red,
+                      shape:
+                          RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                                12),
+                      ),
                     ),
-                    icon: const Icon(Icons.delete, color: Colors.white),
-                    label: const Text("Supprimer",
-                        style: TextStyle(color: Colors.white)),
-                    onPressed: () => _deleteDemande(demande),
+                    icon: const Icon(
+                        Icons.delete,
+                        color: Colors.white),
+                    label: const Text(
+                        "Supprimer",
+                        style: TextStyle(
+                            color: Colors.white)),
+                    onPressed: () =>
+                        _deleteDemande(
+                            demande),
                   ),
                 )
               ],
@@ -261,20 +272,76 @@ class _PageAttestationState extends State<PageAttestation> {
     );
   }
 
-  Widget _logoutButton() {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue.shade700,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 26),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: lightBlueBg,
+      appBar: AppBar(
+        title:
+            const Text("Attestation d'inscription"),
+        centerTitle: true,
+        backgroundColor: primaryBlue,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        shape:
+            const RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.vertical(
+            bottom:
+                Radius.circular(24),
+          ),
+        ),
       ),
-      onPressed: () async {
-        await Amplify.Auth.signOut();
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      },
-      icon: const Icon(Icons.logout, color: Colors.white),
-      label: const Text("Déconnexion",
-          style: TextStyle(color: Colors.white, fontSize: 16)),
+      body: isLoading
+          ? const Center(
+              child:
+                  CircularProgressIndicator(
+                      color: primaryBlue))
+          : Center(
+              child:
+                  SingleChildScrollView(
+                padding:
+                    const EdgeInsets.all(
+                        24),
+                child:
+                    ConstrainedBox(
+                  constraints:
+                      const BoxConstraints(
+                          maxWidth: 600),
+                  child: Card(
+                    elevation: 8,
+                    shape:
+                        RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius
+                              .circular(
+                                  24),
+                    ),
+                    child: Padding(
+                      padding:
+                          const EdgeInsets
+                              .all(24),
+                      child: Column(
+                        mainAxisSize:
+                            MainAxisSize
+                                .min,
+                        children: [
+                          _header(),
+                          const SizedBox(
+                              height: 24),
+                          _buildDemandesList(),
+                          const SizedBox(
+                              height: 24),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+      bottomNavigationBar:
+          CustomBottomNav(),
     );
   }
 }

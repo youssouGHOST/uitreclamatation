@@ -19,6 +19,11 @@ class _DemandePageState extends State<DemandePage> {
   List<Absence> demandes = [];
   bool isLoading = true;
 
+  // Définition des couleurs pour le thème moderne Bleu/Blanc
+  static const Color primaryBlue = Color(0xFF2563EB); // Bleu royal
+  static const Color lightBlueBg = Color(0xFFF0F4F8); // Fond clair bleuté
+  static const Color textDark = Color(0xFF1E293B); // Texte sombre
+
   @override
   void initState() {
     super.initState();
@@ -109,26 +114,47 @@ class _DemandePageState extends State<DemandePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: lightBlueBg,
       appBar: AppBar(
         title: const Text("Mes Absences"),
         centerTitle: true,
-        backgroundColor: const Color(0xFF2F8DFF),
+        backgroundColor: primaryBlue,
         foregroundColor: Colors.white,
-        elevation: 3,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _header(),
-            const SizedBox(height: 20),
-            Expanded(child: _buildDemandesList()),
-            const SizedBox(height: 20),
-            _logoutButton(),
-          ],
+        elevation: 0,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(24),
+          ),
         ),
       ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator(color: primaryBlue))
+          : Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 600),
+                  child: Card(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _header(),
+                          const SizedBox(height: 24),
+                          _buildDemandesList(),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
       bottomNavigationBar: CustomBottomNav(),
     );
   }
@@ -141,26 +167,20 @@ class _DemandePageState extends State<DemandePage> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: lightBlueBg,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 8,
-            spreadRadius: 2,
-          )
-        ],
       ),
       child: Column(
         children: [
           CircleAvatar(
             radius: 35,
-            backgroundImage: const AssetImage('assets/vdemande.png'),
+            backgroundColor: primaryBlue.withOpacity(0.1),
+            child: Icon(Icons.school, size: 40, color: primaryBlue),
           ),
           const SizedBox(height: 12),
           Text(
             "Total Absence : ${demandes.length}",
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: textDark),
           ),
           const SizedBox(height: 6),
           Text(
@@ -173,44 +193,46 @@ class _DemandePageState extends State<DemandePage> {
   }
 
   Widget _buildDemandesList() {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     if (demandes.isEmpty) {
       return const Center(
-        child: Text(
-          "Aucune justification d'absence pour le moment.",
-          style: TextStyle(fontSize: 16, color: Colors.black54),
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Text(
+            "Aucune justification d'absence pour le moment.",
+            style: TextStyle(fontSize: 16, color: Colors.black54),
+          ),
         ),
       );
     }
 
     return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: demandes.length,
       itemBuilder: (context, index) {
         final demande = demandes[index];
 
         return Card(
           elevation: 2,
-          margin: const EdgeInsets.symmetric(vertical: 8),
+          margin: const EdgeInsets.only(bottom: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                 //   _iconForType(demande.typeDemande),
-                    const SizedBox(width: 12),
-               
                     _statusChip(demande.status),
+                    Text(
+                  demande.createdAt != null ? demande.createdAt!.toString().split(' ')[0] : '',
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                if (demande.commentaire != null &&
-                    demande.commentaire!.isNotEmpty)
+                if (demande.commentaire != null && demande.commentaire!.isNotEmpty)
                   Text(
                     "Commentaire : ${demande.commentaire}",
                     style: const TextStyle(fontSize: 14),
@@ -248,48 +270,5 @@ class _DemandePageState extends State<DemandePage> {
     );
   }
 
-  Widget _logoutButton() {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue.shade700,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 26),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      ),
-      onPressed: () async {
-        await Amplify.Auth.signOut();
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      },
-      icon: const Icon(Icons.logout, color: Colors.white),
-      label: const Text("Déconnexion",
-          style: TextStyle(color: Colors.white, fontSize: 16)),
-    );
-  }
-/*
-  Widget _iconForType(TypeDemande? type) {
-    switch (type) {
-      case TypeDemande.ABSENCE:
-        return Image.asset('assets/absence.png', width: 30);
-      case TypeDemande.CHANGEMENTFILIERE:
-        return const Icon(Icons.swap_horiz, color: Colors.indigo, size: 30);
-      case TypeDemande.AJOUTMODULE:
-        return const Icon(Icons.add_box, color: Colors.blue, size: 30);
-      default:
-        return const Icon(Icons.help_outline, color: Colors.grey, size: 30);
-    }
-  }
-
-  String _titleForType(TypeDemande? type) {
-    switch (type) {
-      case TypeDemande.ABSENCE:
-        return "Justification d'absence";
-      case TypeDemande.CHANGEMENTFILIERE:
-        return "Changement de filière";
-      case TypeDemande.AJOUTMODULE:
-        return "Ajout de module";
-      default:
-        return "Demande inconnue";
-    }
-  } 
-      */
-
+  
 }

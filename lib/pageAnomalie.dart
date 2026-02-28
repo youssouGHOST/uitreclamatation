@@ -14,8 +14,14 @@ class PageAnomalie extends StatefulWidget {
 }
 
 class _PageAnomalieState extends State<PageAnomalie> {
+
   List<Anomalies> demandes = [];
   bool isLoading = true;
+
+  // 🎨 Couleurs modernes Bleu/Blanc (identiques à Absence)
+  static const Color primaryBlue = Color(0xFF2563EB);
+  static const Color lightBlueBg = Color(0xFFF0F4F8);
+  static const Color textDark = Color(0xFF1E293B);
 
   @override
   void initState() {
@@ -23,7 +29,6 @@ class _PageAnomalieState extends State<PageAnomalie> {
     _fetchDemandes();
   }
 
-  // 🔵 Charger les anomalies
   Future<void> _fetchDemandes() async {
     setState(() => isLoading = true);
     try {
@@ -35,26 +40,23 @@ class _PageAnomalieState extends State<PageAnomalie> {
       final res = await Amplify.API.query(request: req).response;
 
       if (res.data != null) {
-        demandes = res.data!.items.whereType<Anomalies>().toList();
+        setState(() {
+          demandes = res.data!.items.whereType<Anomalies>().toList();
+        });
       }
-
     } catch (e) {
       safePrint("Erreur: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Erreur lors du chargement")),
-      );
+    } finally {
+      setState(() => isLoading = false);
     }
-
-    setState(() => isLoading = false);
   }
 
-  // 🔴 Suppression
   Future<void> _deleteDemande(Anomalies demande) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Supprimer le signalement ?"),
-        content: const Text("Voulez-vous vraiment supprimer cette anomalie ?"),
+      builder: (_) => AlertDialog(
+        title: const Text("Supprimer l'anomalie ?"),
+        content: const Text("Êtes-vous sûr de vouloir supprimer cette anomalie ?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -70,16 +72,11 @@ class _PageAnomalieState extends State<PageAnomalie> {
     );
 
     if (confirm == true) {
-      try {
-        await Amplify.API.mutate(request: ModelMutations.delete(demande)).response;
-        setState(() => demandes.remove(demande));
-      } catch (e) {
-        safePrint("Erreur suppression: $e");
-      }
+      await Amplify.API.mutate(request: ModelMutations.delete(demande)).response;
+      setState(() => demandes.remove(demande));
     }
   }
 
-  // 🟠 Badge statut
   Widget _statusChip(Status status) {
     Color color;
     String label;
@@ -96,11 +93,11 @@ class _PageAnomalieState extends State<PageAnomalie> {
       case Status.ENCOURS:
       default:
         color = Colors.orange;
-        label = "En cours de traitement";
+        label = "En cours";
     }
-  
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(.15),
         borderRadius: BorderRadius.circular(20),
@@ -112,28 +109,6 @@ class _PageAnomalieState extends State<PageAnomalie> {
     );
   }
 
- Widget _AnomalieChip(Anomalie anomalie) {
-    String type;
-
-    switch (anomalie) {
-      case Anomalie.AFFICHAGE_ENT:
-        type = "AFFICHAGE ENT";
-        break;
-      case Anomalie.CALENDRIER_EXAMEN:
-        type = "Calendrier Examen";
-        break;
-      case Anomalie.INSCRIPTION:
-      default:
-        type = "Problème d'inscription";
-    }
-return 
-  Text("Type d'anomalie : $type",
-    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-     );
-
- }
-
-  //  Header statistique
   Widget _header() {
     int nbAccepte = demandes.where((d) => d.status == Status.ACCEPTE).length;
     int nbRefus = demandes.where((d) => d.status == Status.REFUS).length;
@@ -142,22 +117,23 @@ return
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: lightBlueBg,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 8, spreadRadius: 2),
-        ],
       ),
       child: Column(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 35,
-            backgroundImage: AssetImage('assets/vdemande.png'),
+            backgroundColor: primaryBlue.withOpacity(0.1),
+            child: Icon(Icons.report_problem, size: 40, color: primaryBlue),
           ),
           const SizedBox(height: 12),
           Text(
             "Total anomalies : ${demandes.length}",
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: textDark),
           ),
           const SizedBox(height: 6),
           Text(
@@ -169,14 +145,10 @@ return
     );
   }
 
-  //  Affichage de la liste
   Widget _buildDemandesList() {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     if (demandes.isEmpty) {
-      return const Center(
+      return const Padding(
+        padding: EdgeInsets.all(20.0),
         child: Text(
           "Aucune anomalie signalée pour le moment.",
           style: TextStyle(fontSize: 16, color: Colors.black54),
@@ -184,35 +156,45 @@ return
       );
     }
 
-
-
-
     return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: demandes.length,
       itemBuilder: (context, index) {
         final demande = demandes[index];
 
         return Card(
           elevation: 2,
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          margin: const EdgeInsets.only(bottom: 12),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16)),
           child: Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(width: 12),
                     _statusChip(demande.status),
+                    Text(
+                      demande.createdAt != null
+                          ? demande.createdAt!
+                              .toString()
+                              .split(' ')[0]
+                          : '',
+                      style: const TextStyle(
+                          fontSize: 12, color: Colors.grey),
+                    ),
                   ],
                 ),
-
                 const SizedBox(height: 12),
-               _AnomalieChip(demande.anomalie),
-
-              
+                Text(
+                  "Type : ${demande.anomalie.name}",
+                  style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600),
+                ),
                 if (demande.description != null &&
                     demande.description!.isNotEmpty)
                   Padding(
@@ -222,21 +204,21 @@ return
                       style: const TextStyle(fontSize: 14),
                     ),
                   ),
-
                 const SizedBox(height: 12),
-
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 18, vertical: 10),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                          borderRadius: BorderRadius.circular(12)),
                     ),
-                    icon: const Icon(Icons.delete, color: Colors.white),
-                    label: const Text("Supprimer", style: TextStyle(color: Colors.white)),
+                    icon: const Icon(Icons.delete,
+                        color: Colors.white),
+                    label: const Text("Supprimer",
+                        style: TextStyle(color: Colors.white)),
                     onPressed: () => _deleteDemande(demande),
                   ),
                 )
@@ -248,50 +230,57 @@ return
     );
   }
 
-  // 🔵 Déconnexion
-  Widget _logoutButton() {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue.shade700,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 26),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      ),
-      onPressed: () async {
-        await Amplify.Auth.signOut();
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      },
-      icon: const Icon(Icons.logout, color: Colors.white),
-      label: const Text("Déconnexion",
-          style: TextStyle(color: Colors.white, fontSize: 16)),
-    );
-  }
 
-  // 🏗️ Build complet
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: lightBlueBg,
       appBar: AppBar(
-        title: const Text("Mes anomalies"),
+        title: const Text("Mes Anomalies"),
         centerTitle: true,
-        backgroundColor: const Color(0xFF2F8DFF),
+        backgroundColor: primaryBlue,
         foregroundColor: Colors.white,
-        elevation: 3,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _header(),
-            const SizedBox(height: 20),
-            Expanded(child: _buildDemandesList()),
-            const SizedBox(height: 20),
-            _logoutButton(),
-          ],
+        elevation: 0,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(24),
+          ),
         ),
       ),
+      body: isLoading
+          ? const Center(
+              child:
+                  CircularProgressIndicator(color: primaryBlue))
+          : Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: ConstrainedBox(
+                  constraints:
+                      const BoxConstraints(maxWidth: 600),
+                  child: Card(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(24)),
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize:
+                            MainAxisSize.min,
+                        children: [
+                          _header(),
+                          const SizedBox(height: 24),
+                          _buildDemandesList(),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
       bottomNavigationBar: CustomBottomNav(),
     );
   }
 }
- 
